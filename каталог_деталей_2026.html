@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Каталог деталей 2026 — Физиотехника</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Arsenal:wght@400;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Open Sans", Arial, sans-serif; font-size: 15px; color: #000; background: #fff; display: flex; flex-direction: column; min-height: 100vh; }
+    a { color: inherit; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .wrap { max-width: 1340px; min-width: 320px; padding: 0 20px; margin: 0 auto; }
+
+    /* HEADER */
+    .header { background: #fff; padding: 20px 0 0; font-family: "Arsenal", sans-serif; border-bottom: 1px solid #e8e8e8; }
+    .header .wrap { display: flex; align-items: flex-start; gap: 20px; flex-wrap: wrap; }
+    .header__logo { width: 269px; text-decoration: none; color: #007CC3; text-align: center; font-size: 12px; margin: 10px 0; flex-shrink: 0; display: block; }
+    .header__logo img { width: 100%; display: block; }
+    .header__logo-text { margin: 6px 0 0; line-height: 1.3; font-size: 11px; color: #555; }
+    .header__row { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+    .header-contacts { display: flex; gap: 30px; flex-wrap: wrap; font-size: 14px; }
+    .header-contacts-tel { font: bold 18px "Arsenal", sans-serif; color: #000; text-decoration: none; display: block; }
+    .header-contacts-tel:hover { color: #349DD4; }
+    .header-contacts-text { color: #1893d0; font-size: 13px; }
+    .header-contacts-text2 { color: #1893d0; font-size: 13px; }
+    .header__row-second { display: flex; gap: 14px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+    .btn-outline { display: inline-block; padding: 6px 16px; border: 2px solid #349DD4; border-radius: 20px; color: #349DD4; font: 700 13px "Arsenal", sans-serif; text-transform: uppercase; text-decoration: none; transition: .2s; cursor: pointer; background: none; }
+    .btn-outline:hover { background: #349DD4; color: #fff; text-decoration: none; }
+    .btn-solid { display: inline-block; padding: 6px 16px; background: #dd781d; border: 2px solid #dd781d; border-radius: 20px; color: #fff; font: 700 13px "Arsenal", sans-serif; text-transform: uppercase; text-decoration: none; transition: .2s; cursor: pointer; }
+    .btn-solid:hover { background: #c96510; border-color: #c96510; text-decoration: none; }
+    .cart-btn { position: relative; display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px; background: #349DD4; border: 2px solid #349DD4; border-radius: 20px; color: #fff; font: 700 13px "Arsenal", sans-serif; text-transform: uppercase; cursor: pointer; transition: .2s; }
+    .cart-btn:hover { background: #2a8fc5; }
+    .cart-badge { position: absolute; top: -8px; right: -8px; background: #dd781d; color: #fff; font-size: 11px; font-weight: 700; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; display: none; }
+    .cart-badge.visible { display: flex; }
+
+    /* NAV */
+    .header__nav-container { background: #ddf0ff; margin-top: 8px; }
+    .nav__list { list-style: none; padding: 0; display: flex; justify-content: space-between; margin: 0; }
+    .nav__item { flex-grow: 1; text-align: center; }
+    .nav__link { color: #000; text-decoration: none; display: block; padding: 14px 10px; font: 400 15px "Arsenal", sans-serif; transition: .2s; white-space: nowrap; }
+    .nav__link:hover, .nav__link.active { background: #349DD4; color: #fff; text-decoration: none; }
+
+    /* PAGE TITLE */
+    .page-header { background: #349DD4; padding: 14px 0; }
+    .page-header h1 { font: 600 26px "Arsenal", sans-serif; color: #fff; margin: 0; }
+
+    /* BREADCRUMB */
+    .navigator { padding: 8px 0; color: #b9b9b9; font-size: 13px; }
+    .navigator a { color: #dd781d; margin-right: 8px; }
+
+    /* VIEWS */
+    main { flex: 1; padding: 20px 0 40px; }
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* MODEL FILTER */
+    .model-filter-label { font: 600 14px "Arsenal", sans-serif; color: #555; white-space: nowrap; }
+    .model-select { padding: 7px 12px; border: 1px solid #ccc; border-radius: 4px; font: 400 14px "Open Sans", sans-serif; outline: none; cursor: pointer; background: #fff; }
+    .model-select:focus { border-color: #349DD4; }
+
+    /* CATALOG */
+    .catalog-meta { font-size: 13px; color: #888; margin-bottom: 16px; }
+    .catalog-meta b { color: #333; }
+    .controls { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; width: 100%; }
+    .search-wrap { position: relative; flex: 1; min-width: 200px; max-width: 400px; }
+    .search-wrap input { width: 100%; padding: 8px 14px; border: 1px solid #ccc; border-radius: 20px; font: 400 13px "Open Sans", sans-serif; outline: none; }
+    .search-wrap input:focus { border-color: #349DD4; }
+    .count-badge { background: #e8f4fc; color: #0078b3; font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 12px; white-space: nowrap; font-family: "Arsenal", sans-serif; }
+    .sort-label { font-size: 13px; color: #666; }
+    .sort-select { padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; font: 400 13px "Open Sans", sans-serif; outline: none; cursor: pointer; }
+    .table-wrap { overflow-x: auto; border: 1px solid #dde5ee; border-radius: 4px; box-shadow: 0 2px 6px rgba(0,0,0,.06); }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead tr { background: #349DD4; color: #fff; }
+    thead th { padding: 11px 14px; text-align: left; font: 600 14px "Arsenal", sans-serif; white-space: nowrap; cursor: pointer; user-select: none; }
+    thead th:hover { background: #2a8fc5; }
+    thead th.no-sort { cursor: default; }
+    thead th.no-sort:hover { background: #349DD4; }
+    tbody tr { border-bottom: 1px solid #eef2f8; transition: background .12s; }
+    tbody tr:nth-child(even) { background: #f9fbfd; }
+    tbody tr:hover { background: #e8f4fc; }
+    td { padding: 8px 14px; vertical-align: middle; }
+    td.num { text-align: center; color: #bbb; font-size: 12px; width: 36px; }
+    td.name { min-width: 220px; color: #000; }
+    td.art { font-family: monospace; font-size: 12px; color: #777; white-space: nowrap; }
+    td.price { white-space: nowrap; font-weight: 700; color: #0078b3; text-align: right; font-family: "Arsenal", sans-serif; font-size: 15px; }
+    td.price.no-price { color: #aaa; font-weight: 400; font-style: italic; font-size: 13px; }
+    td.cart-cell { white-space: nowrap; text-align: center; width: 160px; }
+    .qty-input { width: 52px; padding: 5px 6px; border: 1px solid #ccc; border-radius: 4px; text-align: center; font-size: 14px; outline: none; }
+    .qty-input:focus { border-color: #349DD4; }
+    .add-btn { margin-left: 6px; padding: 5px 10px; background: #349DD4; color: #fff; border: none; border-radius: 4px; cursor: pointer; font: 600 12px "Arsenal", sans-serif; transition: background .15s; white-space: nowrap; }
+    .add-btn:hover { background: #2a8fc5; }
+    .add-btn.added { background: #4caf50; }
+    .no-results { text-align: center; padding: 40px; color: #aaa; font-size: 15px; display: none; }
+    .vat-note { margin-top: 12px; font-size: 12px; color: #888; padding: 8px 14px; background: #f4f7fb; border-left: 3px solid #349DD4; }
+
+    /* IMAGE THUMBNAIL */
+    td.img-col { width: 80px; text-align: center; padding: 5px 8px; }
+    thead th.img-col-th { width: 80px; text-align: center; cursor: default; }
+    thead th.img-col-th:hover { background: #349DD4; }
+    .img-thumb { width: 68px; height: 51px; object-fit: contain; cursor: pointer; border: 1px solid #e0e8f0; border-radius: 4px; background: #fff; transition: transform .15s, box-shadow .15s; display: block; margin: 0 auto; }
+    .img-thumb:hover { transform: scale(1.1); box-shadow: 0 4px 12px rgba(0,0,0,.18); }
+    .img-no { width: 68px; height: 51px; background: #f4f7fb; border: 1px dashed #d0d8e4; border-radius: 4px; display: flex; align-items: center; justify-content: center; margin: 0 auto; color: #ccc; font-size: 18px; cursor: pointer; }
+
+    /* PRODUCT CARD MODAL */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 2000; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal-card { background: #fff; border-radius: 8px; box-shadow: 0 8px 36px rgba(0,0,0,.28); max-width: 420px; width: 92%; overflow: hidden; position: relative; }
+    .modal-close { position: absolute; top: 10px; right: 14px; font-size: 22px; cursor: pointer; color: #999; line-height: 1; background: none; border: none; z-index: 1; padding: 2px 6px; }
+    .modal-close:hover { color: #333; }
+    .modal-img-wrap { background: #fff; display: flex; align-items: center; justify-content: center; padding: 24px 24px 16px; border-bottom: 1px solid #eef2f8; min-height: 180px; }
+    .modal-img-wrap img { max-width: 320px; max-height: 240px; object-fit: contain; display: block; }
+    .modal-body { padding: 16px 22px 22px; }
+    .modal-name { font: 600 16px "Arsenal", sans-serif; color: #000; margin-bottom: 6px; line-height: 1.4; }
+    .modal-art { font-size: 12px; color: #999; font-family: monospace; margin-bottom: 6px; }
+    .modal-model { display: inline-block; font-size: 11px; background: #e8f4fc; color: #0078b3; padding: 2px 10px; border-radius: 10px; font-family: "Arsenal", sans-serif; font-weight: 600; margin-bottom: 12px; }
+    .modal-price { font: 700 24px "Arsenal", sans-serif; color: #0078b3; }
+    .modal-price.no-price { font-size: 15px; color: #aaa; font-style: italic; font-weight: 400; }
+
+    /* CART VIEW */
+    .cart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+    .cart-header h2 { font: 700 22px "Arsenal", sans-serif; color: #0078b3; }
+    .back-link { color: #dd781d; cursor: pointer; font-size: 14px; text-decoration: underline; }
+    .back-link:hover { color: #1484c6; }
+    .cart-empty { text-align: center; padding: 60px 20px; color: #aaa; font-size: 16px; }
+    .cart-empty a { color: #349DD4; cursor: pointer; }
+    .cart-table-wrap { overflow-x: auto; border: 1px solid #dde5ee; border-radius: 4px; margin-bottom: 16px; }
+    .cart-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .cart-table thead tr { background: #349DD4; color: #fff; }
+    .cart-table thead th { padding: 10px 14px; font: 600 14px "Arsenal", sans-serif; text-align: left; }
+    .cart-table tbody tr { border-bottom: 1px solid #eef2f8; }
+    .cart-table tbody tr:nth-child(even) { background: #f9fbfd; }
+    .cart-table tbody tr:hover { background: #e8f4fc; }
+    .cart-table td { padding: 8px 14px; vertical-align: middle; }
+    .cart-table td.cart-name { min-width: 200px; }
+    .cart-table td.cart-price-unit { text-align: right; color: #555; }
+    .cart-table td.cart-subtotal { font-weight: 700; color: #0078b3; text-align: right; font-family: "Arsenal", sans-serif; }
+    .cart-qty-input { width: 60px; padding: 5px 6px; border: 1px solid #ccc; border-radius: 4px; text-align: center; font-size: 14px; outline: none; }
+    .cart-qty-input:focus { border-color: #349DD4; }
+    .remove-btn { background: none; border: none; color: #ccc; cursor: pointer; font-size: 18px; padding: 0 4px; transition: color .15s; }
+    .remove-btn:hover { color: #e53935; }
+    .cart-summary { display: flex; justify-content: flex-end; }
+    .cart-totals { background: #f4f7fb; border: 1px solid #dde5ee; border-radius: 4px; padding: 16px 24px; min-width: 300px; font-family: "Arsenal", sans-serif; }
+    .cart-totals-row { display: flex; justify-content: space-between; gap: 20px; padding: 4px 0; font-size: 15px; }
+    .cart-totals-row.total { font-weight: 700; font-size: 18px; color: #0078b3; border-top: 2px solid #349DD4; margin-top: 8px; padding-top: 10px; }
+    .cart-actions { display: flex; gap: 12px; margin-top: 20px; justify-content: flex-end; flex-wrap: wrap; }
+    .btn-invoice { padding: 10px 28px; background: #0078b3; border: 2px solid #0078b3; border-radius: 20px; color: #fff; font: 700 15px "Arsenal", sans-serif; text-transform: uppercase; cursor: pointer; transition: .2s; }
+    .btn-invoice:hover { background: #005d8a; }
+    .btn-clear { padding: 10px 20px; background: none; border: 2px solid #aaa; border-radius: 20px; color: #888; font: 700 14px "Arsenal", sans-serif; text-transform: uppercase; cursor: pointer; transition: .2s; }
+    .btn-clear:hover { border-color: #e53935; color: #e53935; }
+
+    /* FOOTER */
+    .footer { background: #f4f4f4; font-family: "Arsenal", sans-serif; padding: 24px 0 0; font-size: 15px; }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 30px; margin-bottom: 20px; }
+    .footer-title { display: block; font-size: 19px; font-weight: 700; padding-bottom: 8px; }
+    .footer-title a, .footer-title span { color: #dd781d; text-decoration: none; }
+    .footer-title a:hover { color: #1484c6; }
+    .footer .submenu { padding-left: 10px; }
+    .footer .submenu-item { padding: 3px 0; }
+    .footer .submenu-item a { color: #000; text-decoration: none; font-size: 14px; }
+    .footer .submenu-item a:hover { color: #1484c6; }
+    .footer-blockTitle { color: #949494; display: flex; align-items: center; gap: 8px; font-size: 14px; margin-bottom: 8px; }
+    .footer .address { line-height: 1.8; font-size: 14px; }
+    .footer .address a, .footer a[href^="tel:"] { color: #dd781d; text-decoration: none; }
+    .footer a[href^="tel:"]:hover { color: #1484c6; }
+    .footer-bottom { display: flex; gap: 20px; flex-wrap: wrap; padding: 16px 0; border-top: 1px solid #ddd; font-size: 13px; color: #666; }
+    .footer-copyright2 { background: #e8e5e5; text-align: center; padding: 10px 20px; font-size: 12px; color: #666; margin-top: 4px; }
+
+    @media (max-width: 900px) {
+      .footer-grid { grid-template-columns: 1fr; }
+      .header .wrap { flex-direction: column; }
+      .nav__link { padding: 10px 6px; font-size: 13px; }
+      .model-select { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="wrap">
+    <a href="https://pt-med.ru/" class="header__logo">
+      <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNzMgNDguMDYiPjxkZWZzPjxzdHlsZT4uY2xzLTF7ZmlsbDojMDA3OGIzO2ZpbGwtcnVsZTpldmVub2RkO308L3N0eWxlPjwvZGVmcz48dGl0bGU+cHRtZWRfbG9nbzwvdGl0bGU+PGcgaWQ9IkxheWVyXzIiIGRhdGEtbmFtZT0iTGF5ZXIgMiI+PGcgaWQ9IkxheWVyXzEtMiIgZGF0YS1uYW1lPSJMYXllciAxIj48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik05MS44NywxNy43NmMuMy0uOC0uMTgtLjg3LS43Ny0uODctMi4wOCwwLTQuMTcsMC02LjI0LDBhMS41MywxLjUzLDAsMCwwLTEuNzIsMS4yNmMtLjkxLDIuNjktMS44OCw1LjM2LTIuODUsOC0xLjE2LDMuMjItMS4xNywzLjE4LTQuNjQsMy4xOC0xLjEsMC0xLjI5LS4zLS45MS0xLjMxLDEuMjMtMy4yNiwyLjM4LTYuNTQsMy41NS05LjgxLjQ2LTEuMjguNDMtMS4zMi0xLTEuMzItMiwwLTMuOTMuMDYtNS44OCwwYTEuNiwxLjYsMCwwLDAtMS44LDEuMzFjLTEsMi43Ni0yLjE2LDUuNDQtMi45Miw4LjI1YTMuODYsMy44NiwwLDAsMS00LDMuMjhjLS4yOCwwLS41NS4wNy0uODMuMDktNC4yNS4yMi01LjQ0LTEuNTgtMy41My01LjRBMzIuMjgsMzIuMjgsMCwwLDEsNjIsMTljLjkxLTEuMTcuNjMtMi0uNzctMi41NGE0LjIsNC4yLDAsMCwwLTEuNjUtLjI1QTkuODcsOS44NywwLDAsMCw1My43LDE4LjRjLTIuMDgsMS42OC00LjE1LDMuMzgtNi4yMyw1LjA3LS4yMy4xNy0uNDIuNTEtLjkzLjI5LjEyLS4zOS4yMi0uODEuMzctMS4ycTMtOC4zNyw1Ljk0LTE2LjczYy41Ny0xLjYxLjU1LTEuNjUtMS4xOS0xLjY1cy0zLjY4LDAtNS41MiwwQTEuNTQsMS41NCwwLDAsMCw0NC40MSw1LjRDNDIuNTcsMTAuNjgsNDAuNjgsMTYsMzguOCwyMS4yMmMtMS4yNSwzLjUtMi40OCw3LTMuNzUsMTAuNS0uMzIuODgtLjE5LDEuMjguODIsMS4yM2EyMy4xLDIzLjEsMCwwLDEsMi43NiwwLDYuMTcsNi4xNywwLDAsMCw0LjYzLTEuNTljMS42Ny0xLjQzLDMuMzktMi44LDUuMDktNC4xOXExLjY4LTEuMzgsMy4zOC0yLjc0YTkuNjQsOS42NCwwLDAsMS0uNiwyLjY0Yy0uMjguODgtLjYsMS43NC0uODQsMi42My0uNTksMi4yMS4xNSwzLjIxLDIuNDMsMy4yM3M0LjcyLS4xLDcuMDcsMCw0LjQ2LS4xMSw1LjcyLTIuNDVjMCwwLC4wNywwLC4yLS4wNi45MiwyLjQyLDIuODIsMi44LDUuMTUsMi40OWExNy43MSwxNy43MSwwLDAsMSw0LjY2LS4yYzEuNzYuMjQsMi4wNy44LDEuMzIsMi40MS0xLjE1LDIuNDctMi42NCw0Ljc1LTQsNy4xMUEyOS42MiwyOS42MiwwLDAsMCw3MC40NCw0N2MtLjMxLjkzLDAsMS4yMS45MS45NWE4Ljg0LDguODQsMCwwLDAsMy4zNy0yQTU1LjkxLDU1LjkxLDAsMCwwLDg3LDMwLjY0Qzg5LjIyLDI2LjYxLDkwLjIzLDIyLjA1LDkxLjg3LDE3Ljc2WiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTEyNS4zNCw2QTE0NC40MiwxNDQuNDIsMCwwLDEsMTQ1LDQuMzksMzU1LjU1LDM1NS41NSwwLDAsMSwxODUuNCw2cTEyLDEuMTMsMjMuOTIsMi45MWM2LjI5Ljk1LDEyLjQ1LDIuNTMsMTguNjcsMy44MiwxMS40LDIuMzUsMjIuOTEsMS44LDM0LjQuNjRhMTY0LjUxLDE2NC41MSwwLDAsMCwyMy44My00LjI0bDIuNTYtLjY3YzAtLjEsMC0uMi0uMDgtLjMxbC0yLjU5LjY3YS41NS41NSwwLDAsMC0uMzIuMDhjLS4yLDAtLjQsMC0uNTkuMDhhMTcxLjY5LDE3MS42OSwwLDAsMS0yOSwyLjgyYy00LjEyLjA3LTguMjQsMC0xMi4zNS0uMjVhOTUuNjgsOTUuNjgsMCwwLDEtMTUuMjEtMS45QTI2OC4zNiwyNjguMzYsMCwwLDAsMTk4LjI3LDRjLTguOTQtMS0xNy45LTEuNzQtMjYuODktMi03LjQzLS4yMS0xNC44Ny0uMjQtMjIuMy4xOEExNDAsMTQwLDAsMCwwLDEyOS44LDQuMzgsMjYsMjYsMCwwLDAsMTI0LjA5LDYsNCw0LDAsMCwwLDEyNS4zNCw2WiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTEuNzcsNS44NEM5Ljg1LDYsMTcuOTMsNS42MiwyNiw2YzMuMjkuMTcsNC41MiwxLjkyLDMuNzUsNS4xNmE5LjI3LDkuMjcsMCwwLDEtNC4xMSw1LjQxYy0uNjIuNDMtLjY1LjcxLjA3LDFBMTYuODEsMTYuODEsMCwwLDEsMjguNCwxOWMxLjQ3LDEsMi43MS43Nyw0LjEyLS4xNywyLjk1LTEuOTQsNS43LTQsNy03LjQ3LDEuOC00LjYuMTEtOC44MS00LjE1LTEwLjM3YTE4LjEsMTguMSwwLDAsMC01Ljg5LTFMMy4zMywwQzIuNDcsMS4zOSwxLjYsMi43My43Nyw0LjFjLS4yOS40OS0xLDEtLjY5LDEuNTRTMS4xOSw1LjgzLDEuNzcsNS44NFoiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik05OS4wNiwyMmExMS43OCwxMS43OCwwLDAsMSw0LjUyLTcuMzdjMS4yMy0xLDIuNDktMS44OCwzLjcxLTIuODVhMSwxLDAsMCwxLDEuMzgtLjA2LDYsNiwwLDAsMCwzLjk0LDEsNC4xLDQuMSwwLDAsMCwuNjUsMGMzLjkyLS4zNSw2LjQ3LTQuNDIsNC45MS03LjgzYTYuNTQsNi41NCwwLDAsMC03LjA4LTMuMzMsNS43Nyw1Ljc3LDAsMCwwLTUsNS42OCwxLjU2LDEuNTYsMCwwLDEtLjkxLDEuNTEsMzAsMzAsMCwwLDAtMi43MywxLjc0Qzk3LjgxLDEzLjg0LDk0LjMsMTgsOTMuMiwyMy43NGMtLjQsMi4wOC0xLDQuMTItMS4zMiw2LjIxLS44NCw0LjkzLTIuOCw5LjIzLTYuNzUsMTIuNDYtMSwuNzktMS45NCwxLjU0LTIuOTEsMi4zMmEyLjMsMi4zLDAsMCwwLS40MywyLjcsMS4zNCwxLjM0LDAsMCwwLDEuMTMuNjMsMi40NiwyLjQ2LDAsMCwwLDEtLjI3Yy40MS0uMTguODEtLjM1LDEuMi0uNTUsNi40LTMuMjIsMTAuMDgtOC41NSwxMS43Ni0xNS4zN0M5Ny42OSwyOC42MSw5OC40NiwyNS4zNCw5OS4wNiwyMloiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0xOS41Myw5UTE2LjM1LDksMTMuMTgsOWExLjQsMS40LDAsMCwwLTEuNTcsMS4xMWMtMSwzLjEtMi4xOCw2LjE4LTMuMjgsOS4yNy0xLjUzLDQuMjktMyw4LjU5LTQuNiwxMi44Ny0uMzgsMS0uMTIsMS4yNy44OCwxLjIyczIsMCwzLDAsMi4yNCwwLDMuMzYsMGExLjE4LDEuMTgsMCwwLDAsMS4zNC0uODlxNC0xMS4yNSw4LTIyLjQ4QzIwLjU2LDkuMjUsMjAuNCw4Ljk0LDE5LjUzLDlaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMTE5LDI5LjNjLTIuMzIsMC00LjYzLDAtNywwLTEuMzcsMC0xLjM5LDAtLjkyLTEuMzQsMS4xOC0zLjMxLDIuMzYtNi42MywzLjU2LTkuOTMuMjQtLjY4LjMtMS4xNy0uNjctMS4xNnEtMy4zNCwwLTYuNzEsMGExLjE4LDEuMTgsMCwwLDAtMS4yLjk1Yy0xLjI3LDMuNTctMi42LDcuMTMtMy44MSwxMC43Mi0xLDIuOTIuMTUsNC41MSwzLjIzLDQuNTZzNi4wOC4wNyw5LjExLDBjMi4yNi0uMDYsNC4yNS0uNzcsNS40MS0yLjk0LjEzLS4yNi4yOC0uNS42NC0uMzJhNy4wNiw3LjA2LDAsMCwwLDMuNjIsMi42MiwxOC41MSwxOC41MSwwLDAsMCw5LC43OUExMS4yLDExLjIsMCwwLDAsMTM5LDMxYTcuMzcsNy4zNywwLDAsMCwyLjExLTkuNDFjLS40Ny0uODItLjEyLS44Ni41My0uODUsMS4xNiwwLDIuMzIsMCwzLjQ4LDAsMy4xNy0uMDcsMi4zNy41NSwzLjY4LTIuNTYuMzktLjkxLjI5LTEuMjctLjgxLTEuMjYtNS40NCwwLTEwLjg3LDAtMTYuMzEsMGExNi4xNSwxNi4xNSwwLDAsMC03Ljg4LDEuNzNjLTMuNzksMi4xMy01LjQ2LDYuNi0zLjc3LDEwLjIxQzExOS45MywyOS41OCwxMTkuMzUsMjkuMywxMTksMjkuM1ptOC40Ny0yLjYyYy40OS0xLjUxLDEuMTMtMywxLjU1LTQuNTJhMS43MSwxLjcxLDAsMCwxLDIuMTUtMS40OCw2LjM2LDYuMzYsMCwwLDAsMS4wNywwYy42LDAsMS4yLDAsMS44LDAsLjg0LS4wNS45NC4zLjY4LDFxLTEuMywzLjYtMi41NSw3LjIyYTEuMDcsMS4wNywwLDAsMS0xLjI0Ljg2LDE0LjgsMTQuOCwwLDAsMS0xLjg5LS4yNUMxMjcuNDQsMjkuMTUsMTI2LjkzLDI4LjI0LDEyNy40NSwyNi42OFoiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0zMDUuMDUsMTIuNzlhNS44OSw1Ljg5LDAsMCwwLDMuNTQtMS4wOUE1LjI1LDUuMjUsMCwwLDAsMzExLDYuMzNhNS4zMiw1LjMyLDAsMCwwLTMuMzUtNC4yMmMtNC4zLTItOS4yNy45LTkuMTQsNS4yN0MyOTguNjIsMTAuNDYsMzAxLjM2LDEyLjgsMzA1LjA1LDEyLjc5WiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTIzLjI1LDI5LjU2YTUuODcsNS44NywwLDAsMCw2LTUuNyw1LjksNS45LDAsMCwwLTYuMTQtNS41OUE2LDYsMCwwLDAsMTcsMjMuOTIsNiw2LDAsMCwwLDIzLjI1LDI5LjU2WiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTIzNy4xOSw5LjkxcTMuMzQuMjMsNi42Ny40OEExLDEsMCwwLDAsMjQ1LDkuNjNjLjUtMS40NywxLTIuOTMsMS41Ni00LjM5LjIzLS42Mi4wNy0uOS0uNjItLjg5LTEuMTEsMC0yLjIzLDAtMy4zNSwwcy0yLjMxLDAtMy40NiwwYTEsMSwwLDAsMC0xLjA5LjcyYy0uNDUsMS4zMi0uOTMsMi42My0xLjQsMy45NEMyMzYuNTEsOS41MiwyMzYuNTIsOS44NiwyMzcuMTksOS45MVoiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0zNjcuNDcsMzguODdoLS4xMnEtMTM1LDAtMjcwLDBhMy4xMiwzLjEyLDAsMCwwLTMuMDcsMS43MmMtLjQzLjc0LS4zNywxLC41LDEsLjI0LDAsLjQ4LDAsLjcyLDBIMjMxLjExdi0uMThoMTMuMzFsOTIuMjgsMCwzMC41OSwwYTEuNzQsMS43NCwwLDAsMCwxLjg2LTEuOTRDMzY5LDM4LjM5LDM2OCwzOS4wNiwzNjcuNDcsMzguODdaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJNNzEuMzQsNDEuNWMuNTMsMCwxLjc0LTEuNzIsMS41NC0yLjE5LS4zLS43LTEtLjMzLTEuNDgtLjMzLTExLjM5LDAtMjIuNzktLjEyLTMzLjg2LjE0SDIuNzljLTEuMzcsMC0yLjMxLjctMi4xMywxLjlzMS4yOS41NiwxLjk1LjU2cTMzLjcxLDAsNjcuNDEsMEExMS42MywxMS42MywwLDAsMCw3MS4zNCw0MS41WiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTgyLjQxLDQxLjZoLjEyYzIuNTEsMCwyLjUxLDAsMy42OC0xLjUyLjE2LS4yMi40NS0uNDIuMzUtLjcycy0uNDgtLjIxLS43My0uMjJjLTEsMC0yLjA3LDAtMy4xMSwwLS42NSwwLTIuNTIsMS43My0yLjI3LDIuMTJDODAuOTEsNDIsODEuNzUsNDEuNDQsODIuNDEsNDEuNloiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0yODUuNjIsMjhxMS0yLjY2LDEuOS01LjMxYTE1Ljg4LDE1Ljg4LDAsMCwwLDEtMy40NGMuMjMtMS44NC0uNjEtMi44My0yLjQ0LTIuODlhOS4zOCw5LjM4LDAsMCwwLTYuMzcsMi4zN2wtNi44NSw1LjU3YTU4LjkzLDU4LjkzLDAsMCwxLDEuOS02LjA4Yy40NC0xLjIzLjQxLTEuMy0uODYtMS4zLTIsMC00LDAtNiwwYTEuNTEsMS41MSwwLDAsMC0xLjcyLDEuMjRjLTEuMTUsMy40MS0yLjM4LDYuNzktMy41NSwxMC4xOWExLjI2LDEuMjYsMCwwLDEtMS4zNiwxcS0zLjktLjA2LTcuOCwwYy0uOTQsMC0xLjA5LS4zMy0uNzktMS4xNlEyNTMuODksMjUsMjU1LDIxLjg0YTExLjA2LDExLjA2LDAsMCwwLC44MS0yLjg3LDIuMTcsMi4xNywwLDAsMC0yLjM4LTIuNjEsOS45LDkuOSwwLDAsMC02LjYsMi40NmwtNS43Niw0LjcxYy0uMjguMjMtLjUyLjU5LTEuMTIuNDguODktMi40OSwxLjc1LTQuODksMi41OS03LjMuNDMtMS4yMi4zNi0xLjM3LTEtMS40Ni0xLjkxLS4xNC0zLjgzLS4xOC01Ljc0LS4zM2ExLjM5LDEuMzksMCwwLDAtMS42NSwxLjEzQzIzMi44LDIwLDIzMS4zNiwyNCwyMzAsMjcuOTNhMS44MSwxLjgxLDAsMCwxLTIsMS40MWMtNC4xOS0uMDYtOC4zOSwwLTEyLjU5LDAtMS41NiwwLTMuMTIuMDctNC42OCwwLTIuMTYtLjE2LTIuODktMS4zLTIuMjUtMy4zNi40My0xLjM3LDEtMi42OSwxLjQtNC4wOHMxLjQ0LTEuMDgsMi4zOC0xLjEyLjk0Ljc5LDEuMDYsMS40MWMuNDcsMi4zOSwyLjUzLDMuODEsNS4yOSwzLjYzYTQuNjQsNC42NCwwLDAsMCw0LjMyLTQuMjNBNC40Nyw0LjQ3LDAsMCwwLDIxOC43NSwxN2E0MS4zOCw0MS4zOCwwLDAsMC02Ljk1LS4xMiwxNS4yMywxNS4yMywwLDAsMC05LDIuODEsOC4wOCw4LjA4LDAsMCwwLTMuMjQsOC4zNGMuMywxLjEsMCwxLjI4LTEsMS4yNy01LjE1LDAtMTAuMzEsMC0xNS40NywwLS4yNCwwLS41NC4xMS0uOC0uMjJsMS4zOS0uNTVjMi4yNC0uODQsNC41MS0xLjY0LDYuNzMtMi41NmE0LjM0LDQuMzQsMCwwLDAsMi44OC00LjA2Yy4wNy0xLjg2LTEtMy0yLjYyLTMuODFhOS4xNyw5LjE3LDAsMCwwLTIuNS0uODIsMzIuNzEsMzIuNzEsMCwwLDAtOC44NC0uMjMsMTMuNzEsMTMuNzEsMCwwLDAtNi4xOCwyLjEyLDcuODIsNy44MiwwLDAsMC0zLjUxLDkuMTNjLjI1LjkxLS4wOSwxLS44NCwxLTMuNDgsMC02Ljk1LDAtMTAuNDMsMC0xLDAtMS4wNi0uMzUtLjc2LTEuMTUuNjctMS44LDEuMjgtMy42MiwxLjkxLTUuNDMuNjgtMiwuNjgtMiwyLjc5LTIuMDdhNS43OCw1Ljc4LDAsMCwwLDUtMi43OGMuNDEtLjY2LjMyLTEtLjU1LTEtMS4yLDAtMi40LDAtMy42LDAtMS40NiwwLTEuNDksMC0xLTEuMzkuOC0yLjMxLDEuNjMtNC42LDIuNDMtNi45MS4xMy0uNC41Mi0xLS4zMS0xLjFhMTAuNDQsMTAuNDQsMCwwLDAtMy43LjA4Yy0uODMuMjQtMSwxLjI4LTEuNDIsMi0xLjkzLDMuNDEtNC41NSw2LTguNDUsNy0uMTEsMC0uMzIsMC0uMi4zNCwzLjEzLDAsNi4yOSwwLDkuNDUsMCwxLDAsMS4xNS4zNC43MiwxLjE0YTQuODksNC44OSwwLDAsMS00LjI5LDIuNjYsMzUuODMsMzUuODMsMCwwLDEtMy41OSwwLDEuMzEsMS4zMSwwLDAsMC0xLjQ4LDEuMDVjLS43OSwyLjM2LTEuNjYsNC42OC0yLjQ3LDctMSwyLjg2LS4xMSw0LjI3LDIuOTIsNC4zMyw0LjE5LjA4LDguNC4wNywxMi41OSwwLDIuMjUsMCw0LjI5LS42Nyw1LjM3LTMsLjI2LS41NC41MS0uNDUuODgtLjA2LDEuOTEsMiw0LjQ0LDIuNjEsNy4wNywyLjgzLDUuNDYuNDUsMTAuOTQuMiwxNi40Mi4xOSwyLjMzLDAsNC40My0uNzIsNS42NS0zLC4yNC0uNDUuNDYtLjQ2LjgxLS4xLDIsMiw0LjQ3LDIuNjgsNy4xNiwyLjkzYTk3LjA5LDk3LjA5LDAsMCwwLDEwLjc5LjE0YzMuMzYtLjA2LDYuODcuNzUsMTAuMjUtMS42My0uNzMsMS40MS0uMzIsMS43NS43MywxLjY3YTE1LjU3LDE1LjU3LDAsMCwxLDIuMTYsMCw3LjMzLDcuMzMsMCwwLDAsNS40OS0xLjk1YzIuNDEtMi4wOSw0LjkzLTQuMDcsNy40MS02LjA5LjIyLS4xNy4zOS0uNTQuODgtLjI4LS41LDEuNTEtMSwzLTEuNSw0LjUzLS44MywyLjczLS4wOCwzLjc1LDIuNzYsMy43OCwyLjY4LDAsNS4zNiwwLDgsMHM1LjA2LS4xNyw2Ljg5LTIuNTVhMy40LDMuNCwwLDAsMS0uMzYsMS42OGMtLjE4LjU5LDAsLjgxLjYuODZhMTEuMzMsMTEuMzMsMCwwLDAsOS0yLjY4YzIuMDgtMS44Nyw0LjI2LTMuNjIsNi40LTUuNDMuMTktLjE1LjM2LS40Ny42OS0uMjVhLjc0Ljc0LDAsMCwxLDAsLjI1Yy0uNDcsMS4zNi0xLDIuNzEtMS40MSw0LjA4LS45MSwyLjc4LS4xMywzLjg4LDIuODEsNGguMjRjMywwLDYuMDgsMCw5LjEyLDBhNi44Miw2LjgyLDAsMCwwLDMuNzgtMSw0LjMzLDQuMzMsMCwwLDAsMS4zNS0xYy4yNy0uMjQuNDgtLjI4LjYzLjExLjU5LDEuNTcsMS45NCwxLjgxLDMuMzMsMS44NCwzLjE2LDAsNi4zMi4wNyw5LjQ3LDBhNS43Myw1LjczLDAsMCwwLDQuODYtMi40MmMuMjItLjMyLjU1LS42OC4zOC0xLjA4cy0uNy0uMjctMS4wOC0uMjhjLTIuMzYsMC00LjcyLDAtNy4wNywwLTEsMC0xLjI1LS4yNi0uODgtMS4yNCwxLjIzLTMuMzMsMi4zOS02LjY5LDMuNjEtMTAsLjI5LS43OS4yMS0xLjItLjc2LTEuMThxLTMuMjQsMC02LjQ4LDBhMS4zLDEuMywwLDAsMC0xLjM4LDFjLTEuMzQsMy44MS0yLjcyLDcuNi00LjA4LDExLjQtMi42NCwwLTUuMjgsMC03LjkyLDBDMjg1LjE0LDI5LjMxLDI4NS4xNCwyOS4zLDI4NS42MiwyOFpNMTgwLjEzLDI5LjE5Yy0xLS4zLTEuOTMtLjc3LTEuNzQtMS45MmEzNi4yLDM2LjIsMCwwLDEsMi02LjEzYy4xNC0uNDEuNTMtLjQ0LjktLjQ0SDE4M2MyLjU5LDAsMi41OSwwLDEuNTMsMi4zLS44LDEuNzMtMS42NiwzLjQ1LTIuNCw1LjIxQTEuNDEsMS40MSwwLDAsMSwxODAuMTMsMjkuMTlaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMzcyLDI5LjMyYy0yLjQ0LDAtNC44OC0uMDUtNy4zMiwwLTEuMTMsMC0xLjI3LS4zMS0uOS0xLjMxLDEuMjUtMy4yOCwyLjQxLTYuNjEsMy42My05LjkuMzQtLjkuMTItMS4yNi0uODUtMS4yNC00LjguMDktOS42LS4yMS0xNC4zOS4xOS01LC40Mi0xMC44OCw0LjA5LTEwLjI0LDExLC4xLDEuMDUtLjMzLDEuMjktMS4yOSwxLjI4LTIuNzYsMC01LjUyLDAtOC4yNywwLTIuNDUsMC00Ljg4LDAtNy4zMiwwYTcuNjQsNy42NCwwLDAsMS0yLjM4LS4yMiwxLjkzLDEuOTMsMCwwLDEtMS41LTIuNTdjLjUxLTEuNzYsMS4xMy0zLjUsMS44MS01LjIuNDYtMS4xMiwxLjU0LS41MSwyLjM1LS42cy43NC41My44LDEuMDZhNC4yNyw0LjI3LDAsMCwwLDIuMjMsMy4zNiw1LjM0LDUuMzQsMCwwLDAsNS42Ny0uMzcsNC4xNyw0LjE3LDAsMCwwLDEuNTYtNC41OCw0LjUzLDQuNTMsMCwwLDAtNC4yMS0zLjIsNTAuNDIsNTAuNDIsMCwwLDAtNS42My0uMSwxOC44OCwxOC44OCwwLDAsMC01LjkzLjc2QzMxNiwxOC45MiwzMTMsMjEsMzEyLjMsMjUuMzRBNS4zLDUuMywwLDAsMCwzMTQsMzAuNTVhMTAuNTEsMTAuNTEsMCwwLDAsNi4yOCwyLjM3YzUuNTkuNDUsMTEuMTkuMTYsMTYuNzkuMThBNS43OCw1Ljc4LDAsMCwwLDM0MS44NSwzMWMuNDEtLjUzLjYzLS41NiwxLDBBNS43OCw1Ljc4LDAsMCwwLDM0NywzMy40NmE4LjA2LDguMDYsMCwwLDAsNi43NS0yLjA4Yy40MS0uMzcuNy0uNjYsMSwuMTJhMi4zMywyLjMzLDAsMCwwLDIuMTksMS40NCw2Ni4yOCw2Ni4yOCwwLDAsMCwxMi40NC0uMDgsNC4yNCw0LjI0LDAsMCwwLDMuMzMtMi4zLDMuMDYsMy4wNiwwLDAsMCwuMzEtLjY2di0uMzVDMzcyLjksMjkuMzcsMzcyLjU5LDI5LjMzLDM3MiwyOS4zMlptLTE1LTYuMDZjLS41OSwxLjY5LTEuMjMsMy4zNy0xLjc4LDUuMDhhMS4yMSwxLjIxLDAsMCwxLTEuNTIuOTRDMzUxLDI5LDM1MC4zNywyOCwzNTEuMTYsMjUuNDJjLjMyLTEuMDcuNzItMi4xMy45NS0zLjIxcy44Ni0xLjcyLDIuMDctMS41M2E2LjE4LDYuMTgsMCwwLDAsMSwwQzM1Ny45LDIwLjY5LDM1Ny45LDIwLjcsMzU3LDIzLjI2WiIvPjwvZz48L2c+PC9zdmc+" alt="Физиотехника">
+      <p class="header__logo-text">Производство медицинского оборудования<br>разработка физиотерапевтических<br>и реабилитационных комплексов</p>
+    </a>
+    <div class="header__row">
+      <div class="header-contacts">
+        <div>
+          <a href="tel:+78123216780" class="header-contacts-tel">+7 (812) 321-67-80</a>
+          <a href="#" class="header-contacts-text2">Заказать звонок</a>
+        </div>
+        <div>
+          <a href="tel:88005116780" class="header-contacts-tel">8-800-511-67-80</a>
+          <span class="header-contacts-text">Бесплатно по России</span>
+        </div>
+        <div style="font-size:13px;"><a href="https://pt-med.ru/clients/informatsiya-o-dostavke/">Доставка по России и странам СНГ</a></div>
+        <div style="font-size:13px;"><a href="https://pt-med.ru/orders/">Оборудование по приказам оснащения</a></div>
+      </div>
+      <div class="header__row-second">
+        <span style="font-size:13px;">Цены в: <strong>₽</strong></span>
+        <span style="font-size:13px;font-family:Arsenal,sans-serif;">Рус | <a href="https://pt-med.ru/en/" style="color:#dd781d;">Eng</a></span>
+        <button class="btn-outline">Сервис</button>
+        <button class="btn-solid">Запросить КП</button>
+        <button class="cart-btn" onclick="showView('cart')">
+          &#128722; Корзина
+          <span class="cart-badge" id="cartBadge">0</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="header__nav-container">
+    <div class="wrap">
+      <nav><ul class="nav__list">
+        <li class="nav__item"><a href="https://pt-med.ru/about_the_company/" class="nav__link">О Компании</a></li>
+        <li class="nav__item"><a href="https://pt-med.ru/products/" class="nav__link active">Каталог</a></li>
+        <li class="nav__item"><a href="https://pt-med.ru/proektirovanie-i-stroitelstvo-sanatorno-kurortnyh-/" class="nav__link">Проектирование</a></li>
+        <li class="nav__item"><a href="https://pt-med.ru/aktcii/" class="nav__link">Акции</a></li>
+        <li class="nav__item"><a href="https://pt-med.ru/clients/" class="nav__link">Клиентам</a></li>
+        <li class="nav__item"><a href="https://pt-med.ru/service/" class="nav__link">Сервис</a></li>
+        <li class="nav__item"><a href="https://pt-med.ru/contacts/" class="nav__link">Контакты</a></li>
+      </ul></nav>
+    </div>
+  </div>
+</header>
+
+<div class="page-header">
+  <div class="wrap"><h1>Каталог запасных частей и комплектующих</h1></div>
+</div>
+
+<div class="navigator wrap">
+  <a href="https://pt-med.ru/">Главная</a> &raquo;
+  <a href="https://pt-med.ru/products/">Каталог</a> &raquo;
+  Запасные части 2026
+</div>
+
+<main>
+  <div id="viewCatalog" class="view active">
+    <div class="wrap">
+      <div class="catalog-meta">Прайс-лист на запасные части и комплектующие. Цены действительны с <b>01.01.2026</b>.</div>
+
+      <!-- CONTROLS (фильтр + поиск + сортировка) -->
+      <div class="controls">
+        <label class="model-filter-label" for="modelSelect">Модель:</label>
+        <select id="modelSelect" class="model-select" onchange="setModel(this.value)">
+          <option value="">Все модели</option>
+          <option value="Акваспа">Акваспа</option>
+          <option value="Вуокса">Вуокса</option>
+          <option value="Душ Шарко">Душ Шарко</option>
+          <option value="Кватроджет">Кватроджет</option>
+          <option value="Посейдон">Посейдон</option>
+        </select>
+        <div class="search-wrap">
+          <input type="search" id="searchInput" placeholder="Поиск по наименованию или артикулу..." oninput="filterTable()">
+        </div>
+        <span class="count-badge" id="countBadge"></span>
+        <label class="sort-label">Сортировка:</label>
+        <select class="sort-select" id="sortSelect" onchange="sortTable()">
+          <option value="qty-desc">По популярности</option>
+          <option value="price-asc">Цена: по возрастанию</option>
+          <option value="price-desc">Цена: по убыванию</option>
+          <option value="name-asc">По наименованию</option>
+        </select>
+      </div>
+
+      <div class="table-wrap">
+        <table id="catalogTable">
+          <thead><tr>
+            <th class="num no-sort">#</th>
+            <th class="img-col-th no-sort">Фото</th>
+            <th onclick="toggleSort('name')">Наименование ↕</th>
+            <th onclick="toggleSort('art')">Артикул ↕</th>
+            <th onclick="toggleSort('price')" style="text-align:right">Цена 2026, ₽ (с НДС 5%) ↕</th>
+            <th class="no-sort" style="text-align:center">В корзину</th>
+          </tr></thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+        <div class="no-results" id="noResults">Ничего не найдено.</div>
+      </div>
+      <div class="vat-note">* Цены в рублях, включают НДС 5%. Действительны с 01.01.2026. Для оформления заказа обратитесь к менеджеру.</div>
+    </div>
+  </div>
+
+  <!-- CART VIEW -->
+  <div id="viewCart" class="view">
+    <div class="wrap">
+      <div class="cart-header">
+        <h2>&#128722; Корзина</h2>
+        <span class="back-link" onclick="showView('catalog')">&#8592; Вернуться в каталог</span>
+      </div>
+      <div id="cartContent"></div>
+    </div>
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <span class="footer-title"><a href="https://pt-med.ru/">ООО «Физиотехника»</a></span>
+        <div class="footer-blockTitle">Адрес</div>
+        <div class="address">
+          188662, Ленинградская обл., Всеволожский р-н,<br>
+          г. Сертолово, ул. Центральная, д. 11<br>
+          <a href="tel:+78123216780">+7 (812) 321-67-80</a><br>
+          <a href="mailto:info@pt-med.ru">info@pt-med.ru</a>
+        </div>
+      </div>
+      <div>
+        <span class="footer-title"><span>Каталог</span></span>
+        <div class="submenu">
+          <div class="submenu-item"><a href="https://pt-med.ru/products/">Медицинское оборудование</a></div>
+          <div class="submenu-item"><a href="https://pt-med.ru/products/vanny-i-dushi/">Ванны и души</a></div>
+          <div class="submenu-item"><a href="https://pt-med.ru/products/kushetki/">Кушетки</a></div>
+          <div class="submenu-item"><a href="https://pt-med.ru/products/stuly/">Стулья</a></div>
+        </div>
+      </div>
+      <div>
+        <span class="footer-title"><span>Информация</span></span>
+        <div class="submenu">
+          <div class="submenu-item"><a href="https://pt-med.ru/about_the_company/">О компании</a></div>
+          <div class="submenu-item"><a href="https://pt-med.ru/clients/">Клиентам</a></div>
+          <div class="submenu-item"><a href="https://pt-med.ru/service/">Сервис</a></div>
+          <div class="submenu-item"><a href="https://pt-med.ru/contacts/">Контакты</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-copyright2">© 2026 ООО «Физиотехника». Все права защищены.</div>
+</footer>
+
+<script>
+const rawData = [
+  ["1001010109","Кран-букса 3/4\" с переходником на шар",3150,353,"Вуокса"],
+  ["8454039808","Кран шаровый 3/4\" для кафедры Вуокса",5250,233,"Вуокса"],
+  ["1001010069","Кран-букса 3/4\" с переходником на тюльпан",3150,183,"Вуокса"],
+  ["1001010019","Кран под пайку d25 (тюльпан), белый",12500,100,"Вуокса"],
+  ["8454157460","Втулка резьбовая",2625,48,"Вуокса"],
+  ["1001010018","Кран под пайку d25 (шар)",12500,39,"Вуокса"],
+  ["8454039792","Кран шаровый 1/2\" для кафедры Вуокса",5250,39,"Вуокса"],
+  ["AA00.00.00.017","Гайка М23",420,36,"Вуокса"],
+  ["SMART SG55328-E2304","Клапана форсунок в сборе (24В)",23625,32,"Вуокса"],
+  ["8454157459","Гайка резьбовой втулки",420,31,"Вуокса"],
+  ["FV01.00.00.000-01","Вакуумная насадка (с РУ)",115500,21,"Вуокса"],
+  ["8458011999","Аэрокомпрессор 700 W BLOWER A-SA",null,20,"Вуокса"],
+  ["AA00.00.00.053","Держатель поручня М12",2520,20,"Душ Шарко"],
+  ["1001010027","Аэрофорсунка 7 отв. в сборе",2625,18,"Душ Шарко"],
+  ["8454004199","Гибкая подводка Гигант 60 см  3/4\" гайка-гайка",840,18,"Душ Шарко"],
+  ["8454222407","Джет МАК",2625,18,"Душ Шарко"],
+  ["8455172378","Лейка к Душу Виши",5460,17,"Душ Шарко"],
+  ["8454222413","Аэрогребенка 12 вых.",2600,16,"Душ Шарко"],
+  ["8454227490","Аэрофорсунка (с крышкой)",2625,16,"Душ Шарко"],
+  ["8454222445","Джет звёздного дождя в сборе",1260,16,"Душ Шарко"],
+  ["8454222411","Кнопка включения (высокая)",3675,16,"Душ Шарко"],
+  ["1001010038","Форсунка с соплом в сборе",3150,14,"Душ Шарко"],
+  ["8459120032","Бандаж на Аист Поясной большой 50-62",14000,12,"Душ Шарко"],
+  ["CHK04.00.00.002","Втулка ограничительная CHK04.00.00.002",2205,12,"Душ Шарко"],
+  ["1001010030","Гидрофорсунка малая в сборе",3150,12,"Посейдон"],
+  ["8454039889","Заглушка маховика (белая)",472,12,"Посейдон"],
+  ["8459120029","Бандаж на Аист Поясной малый 38-50",14000,11,"Посейдон"],
+  ["8454157469","Гайка 2\" АВС",525,10,"Посейдон"],
+  ["1001010107","Кран-букса 1\" с переходником на шар",3150,9,"Посейдон"],
+  ["8454004206","Гибкая подводка Гигант 80 см  3/4\" вн/р - нар/р",945,8,"Посейдон"],
+  ["8454039895","Кран шаровый 1\" для кафедры Вуокса",5250,8,"Посейдон"],
+  ["KV00.00.00.020","Веерная насадка для душа Шарко",4500,7,"Посейдон"],
+  ["8454039887","Заглушка маховика (красная)",472,7,"Посейдон"],
+  ["8454039888","Заглушка маховика (синяя)",472,7,"Посейдон"],
+  ["8454039879","Кран вентильный 3/4\" (латунь)",19000,7,"Посейдон"],
+  ["8454222412","Аэрогребенка 32 вых.",3644,6,"Посейдон"],
+  ["8459019010","Клей 125 гр.",1050,6,"Посейдон"],
+  ["8454039876","Кран вентильный 1\" (латунь)",19000,6,"Посейдон"],
+  ["8454039875","Кран вентильный 1/2\" (латунь)",19000,6,"Кватроджет"],
+  ["8454037440","Кран шаровый ПВХ д.50",5250,6,"Кватроджет"],
+  ["CHK00.09.00.000-01","Брызгозащитные крышки для 4-х камерных ванн «Истра-4К»",35000,5,"Кватроджет"],
+  ["8456113131","Вентилятор вытяжной для ванны пароуглекислой",31500,5,"Кватроджет"],
+  ["8454136794","Втулка-удлинение 45202000 ГРОЭ",1600,5,"Кватроджет"],
+  ["8454204398","Звездочка муфты",1050,5,"Кватроджет"],
+  ["8455177814","Кнопка включения (плоская)",3675,5,"Кватроджет"],
+  ["1001010172","Кнопка включения котла (в сборе)",3675,5,"Кватроджет"],
+  ["1001010224","Кран-букса 1\" с переходником на шар",3150,5,"Кватроджет"],
+  ["8458012007","Воздуходувка 2RB",47250,4,"Кватроджет"],
+  ["8456003143","Датчик температуры воздуха канальный",15750,4,"Кватроджет"],
+  ["8455272349","Доводчик дверной белый",6300,4,"Кватроджет"],
+  ["8454157470","Залив белый",1050,4,"Кватроджет"],
+  ["8454222414","Кнопка включения белая ",5250,4,"Кватроджет"],
+  ["8454227489","Корпус форсунки (евромик)",1050,4,"Кватроджет"],
+  ["8456470002","Аккумуляторная батарея для подъемника для камерных ванн",32200,3,"Кватроджет"],
+  ["8459120025","Бандаж на ванну Атланта Поясной малый 38-50",14000,3,"Кватроджет"],
+  ["8459120008","Бандаж шейный \"Петля Глиссона\"",7000,3,"Кватроджет"],
+  ["8454021814","Клапан подачи воды для ванны ПУВ",3150,3,"Кватроджет"],
+  ["8459120000","Комплект бандажей для комплекса Атланта",50000,3,"Кватроджет"],
+  ["8454004207","080см Подводка д/воды ГИГАНТ SS 34мм 1\" в-в",2205,2,"Кватроджет"],
+  ["8455177424","Газлифт НТМ",1470,2,"Кватроджет"],
+  ["8459080142","Датчик температуры (NTC)",4725,2,"Кватроджет"],
+  ["нет01","Датчик температуры терморегулятора",2362,2,"Кватроджет"],
+  ["АТ01.00.04.001","Держатель подголовника ванна Атланта",1575,2,"Кватроджет"],
+  ["AA00.00.00.014","Держатель поручня сквозной",2520,2,"Кватроджет"],
+  ["8455178778","Диск для противовеса 0,5 кг.",378,2,"Кватроджет"],
+  ["8456003136","Зарядное уст-во. 24В ChAPb-220-24-1000",7350,2,"Кватроджет"],
+  ["нет02","Защитный экран для душа Виши в сборе с кронштейном",10500,2,"Кватроджет"],
+  ["8459120003","Комплект бандажей для установки \"АИСТ\"",50000,2,"Кватроджет"],
+  ["1001020008","Комплект насадок для ПДМ (4 шт)",6300,2,"Акваспа"],
+  ["8456286323","Контроллер Z30",15750,2,"Акваспа"],
+  ["1001010011","Кран под пайку d32 (тюльпан), белый",12500,2,"Акваспа"],
+  ["8454039893","Кран шаровый 50 мм",5250,2,"Акваспа"],
+  ["8454039874","Кран шаровый mini 1/2\"",1050,2,"Акваспа"],
+  ["8459120065","Кронштейн для лейки белой",2625,2,"Акваспа"],
+  ["8455172392","Кронштейн крепления для ручного душа",2625,2,"Акваспа"],
+  ["8453362550","Лейка для дождевого душа",7770,2,"Акваспа"],
+  ["8455172393","Лейка ручного душа белая",4725,2,"Акваспа"],
+  ["8455256789","Cиденье со спинкой белое",4725,1,"Акваспа"],
+  ["8456007471","Актуатор вытяжения для ванн",42000,1,"Акваспа"],
+  ["8459120022","Бандаж на ванну Атланта Грудной малый 38-50",14000,1,"Акваспа"],
+  ["8459120024","Бандаж на ванну Атланта Поясной большой 50-62",14000,1,"Акваспа"],
+  ["8455178828","Бачок для воды на СУВ",2100,1,"Акваспа"],
+  ["8456113142","Вентилятор подачи воздуха",2000,1,"Акваспа"],
+  ["8459017847","Держатель термодатчика TIEMME",504,1,"Акваспа"],
+  ["8455178779","Диск для противовеса 1 кг.",472,1,"Акваспа"],
+  ["8459120082","Звездный дождь пластик ФЗТ",15750,1,"Акваспа"],
+  ["8455178786","Источник света УФ",4200,1,"Акваспа"],
+  ["8454021843","Клапан электромагнитный DN10 (3/8\")",7350,1,"Акваспа"],
+  ["8451146995","Контргайка 2\"",1575,1,"Акваспа"],
+  ["8451146994","Контргайка с фланцем 1/2\" латунь",262,1,"Акваспа"],
+  ["1001010043","Кран под пайку d25 (тюльпан), красный",12500,1,"Акваспа"],
+  ["1001010044","Кран под пайку d25 (тюльпан), синий",12500,1,"Акваспа"],
+  ["1001010036","Кран под пайку d32 ПДМ (шар)",12500,1,"Акваспа"],
+  ["SUV00.00.00.015","Кронштейн для бачка СУВ",1050,1,"Акваспа"]
+];
+
+// VIEWS
+function showView(name){
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  document.getElementById("view"+name.charAt(0).toUpperCase()+name.slice(1)).classList.add("active");
+  if(name==="cart") renderCart();
+  window.scrollTo(0,0);
+}
+
+// MODEL FILTER
+let activeModel = "";
+function setModel(model){
+  activeModel = model;
+  filterTable();
+}
+
+// CATALOG
+let sortKey="qty", sortDir=-1;
+function noun(n){ return n===1?"позиция":(n>=2&&n<=4?"позиции":"позиций"); }
+function imgFile(art){ return "img/" + encodeURIComponent(art) + ".png"; }
+
+function renderTable(data){
+  const tbody = document.getElementById("tableBody");
+  document.getElementById("noResults").style.display = data.length ? "none" : "block";
+  document.getElementById("countBadge").textContent = data.length + " " + noun(data.length);
+  tbody.innerHTML = data.map((r,i) => {
+    const hasPrice = r[2] != null;
+    const priceCell = hasPrice
+      ? `<td class="price">${r[2].toLocaleString("ru-RU")} &#8381;</td>`
+      : `<td class="price no-price">по запросу</td>`;
+    const cartCell = hasPrice
+      ? `<td class="cart-cell">
+           <input class="qty-input" id="qty_${r[0].replace(/[^a-z0-9]/gi,"_")}" type="number" value="1" min="1" max="9999">
+           <button class="add-btn" id="btn_${r[0].replace(/[^a-z0-9]/gi,"_")}" onclick="addToCart('${r[0].replace(/\\/g,'\\\\').replace(/'/g,"\\'")}',this)">В корзину</button>
+         </td>`
+      : `<td class="cart-cell" style="color:#aaa;font-size:12px;">&#8212;</td>`;
+    const esc = r[1].replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+    const artEsc = r[0].replace(/\\/g,"\\\\").replace(/'/g,"\\'");
+    const nameEsc = r[1].replace(/\\/g,"\\\\").replace(/'/g,"\\'");
+    const modelEsc = (r[4]||"").replace(/'/g,"\\'");
+    const pVal = r[2] !== null ? r[2] : "null";
+    const imgCell = `<td class="img-col">
+      <img class="img-thumb" src="${imgFile(r[0])}" alt="${esc}"
+        onclick="openCard(\'${artEsc}\',\'${nameEsc}\',${pVal},\'${modelEsc}\')"
+        onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">
+      <div class="img-no" style="display:none" onclick="openCard(\'${artEsc}\',\'${nameEsc}\',${pVal},\'${modelEsc}\')">&#128247;</div>
+    </td>`;
+    return `<tr>
+      <td class="num">${i+1}</td>
+      ${imgCell}
+      <td class="name">${r[1]}</td>
+      <td class="art">${r[0]}</td>
+      ${priceCell}
+      ${cartCell}
+    </tr>`;
+  }).join("");
+}
+
+function getFiltered(){
+  let data = [...rawData];
+  if(activeModel) data = data.filter(r => r[4] === activeModel);
+  const q = document.getElementById("searchInput").value.toLowerCase().trim();
+  if(q) data = data.filter(r => r[0].toLowerCase().includes(q) || r[1].toLowerCase().includes(q));
+  return data;
+}
+
+function applySort(data){
+  data.sort((a,b)=>{
+    if(sortKey==="qty") return sortDir*(b[3]-a[3]);
+    if(sortKey==="price"){ const pa=a[2]??(sortDir>0?Infinity:-Infinity),pb=b[2]??(sortDir>0?Infinity:-Infinity); return sortDir*(pa-pb); }
+    if(sortKey==="name") return sortDir*a[1].localeCompare(b[1],"ru");
+    return 0;
+  });
+  renderTable(data);
+}
+function filterTable(){ applySort(getFiltered()); }
+function sortTable(){
+  const v=document.getElementById("sortSelect").value;
+  ({"qty-desc":()=>{sortKey="qty";sortDir=-1;},"price-asc":()=>{sortKey="price";sortDir=1;},"price-desc":()=>{sortKey="price";sortDir=-1;},"name-asc":()=>{sortKey="name";sortDir=1;}})[v]?.();
+  filterTable();
+}
+function toggleSort(key){
+  if(sortKey===key) sortDir=-sortDir; else {sortKey=key; sortDir=1;}
+  filterTable();
+}
+
+// CART
+let cart = {};
+function updateBadge(){
+  const n=Object.values(cart).reduce((s,x)=>s+x.qty,0);
+  const b=document.getElementById("cartBadge");
+  b.textContent=n;
+  n>0 ? b.classList.add("visible") : b.classList.remove("visible");
+}
+function addToCart(art, btn){
+  const r=rawData.find(x=>x[0]===art);
+  if(!r||!r[2]) return;
+  const qId="qty_"+art.replace(/[^a-z0-9]/gi,"_");
+  const qty=parseInt(document.getElementById(qId)?.value)||1;
+  if(cart[art]) cart[art].qty+=qty;
+  else cart[art]={art:r[0],name:r[1],price:r[2],qty};
+  btn.textContent="&#10003; Добавлено";
+  btn.classList.add("added");
+  setTimeout(()=>{btn.textContent="В корзину";btn.classList.remove("added");},1500);
+  updateBadge();
+}
+function renderCart(){
+  const items=Object.values(cart);
+  const el=document.getElementById("cartContent");
+  if(!items.length){
+    el.innerHTML=`<div class="cart-empty">Корзина пуста. <a onclick="showView(\'catalog\')">Перейти в каталог</a></div>`;
+    return;
+  }
+  const total=items.reduce((s,x)=>s+x.price*x.qty,0);
+  const vat=Math.round(total*5/105);
+  const net=total-vat;
+  el.innerHTML=`
+    <div class="cart-table-wrap"><table class="cart-table">
+      <thead><tr><th>#</th><th class="cart-name">Наименование</th><th>Артикул</th>
+        <th style="text-align:center">Кол-во</th>
+        <th class="cart-price-unit" style="text-align:right">Цена за ед.</th>
+        <th class="cart-subtotal">Сумма</th><th></th></tr></thead>
+      <tbody>${items.map((x,i)=>`<tr>
+        <td class="num">${i+1}</td>
+        <td class="cart-name">${x.name}</td>
+        <td style="font-family:monospace;font-size:12px;color:#777">${x.art}</td>
+        <td style="text-align:center"><input class="cart-qty-input" type="number" value="${x.qty}" min="1" max="9999"
+          onchange="updateQty(\'${x.art.replace(/'/g,"\\'")}\',this.value)"></td>
+        <td class="cart-price-unit">${x.price.toLocaleString("ru-RU")} &#8381;</td>
+        <td class="cart-subtotal">${(x.price*x.qty).toLocaleString("ru-RU")} &#8381;</td>
+        <td><button class="remove-btn" onclick="removeFromCart(\'${x.art.replace(/'/g,"\\'")}\')">&#10005;</button></td>
+      </tr>`).join("")}</tbody>
+    </table></div>
+    <div class="cart-summary"><div class="cart-totals">
+      <div class="cart-totals-row"><span>Сумма без НДС:</span><span>${net.toLocaleString("ru-RU")} &#8381;</span></div>
+      <div class="cart-totals-row"><span>НДС 5%:</span><span>${vat.toLocaleString("ru-RU")} &#8381;</span></div>
+      <div class="cart-totals-row total"><span>Итого к оплате:</span><span>${total.toLocaleString("ru-RU")} &#8381;</span></div>
+    </div></div>
+    <div class="cart-actions">
+      <button class="btn-clear" onclick="clearCart()">Очистить корзину</button>
+      <button class="btn-invoice" onclick="generateInvoice()">&#128196; Сформировать счёт</button>
+    </div>`;
+}
+function updateQty(art,val){const q=parseInt(val);if(cart[art]){cart[art].qty=q>0?q:1;renderCart();updateBadge();}}
+function removeFromCart(art){delete cart[art];renderCart();updateBadge();}
+function clearCart(){if(confirm("Очистить корзину?")){cart={};renderCart();updateBadge();}}
+
+// INVOICE
+function generateInvoice(){
+  const items=Object.values(cart);
+  if(!items.length){alert("Корзина пуста");return;}
+  const total=items.reduce((s,x)=>s+x.price*x.qty,0);
+  const vat=Math.round(total*5/105), net=total-vat;
+  const date=new Date().toLocaleDateString("ru-RU");
+  const rowsHtml=items.map((x,i)=>`<tr>
+    <td style="border:1px solid #aaa;padding:5px;text-align:center">${i+1}</td>
+    <td style="border:1px solid #aaa;padding:5px">${x.name}</td>
+    <td style="border:1px solid #aaa;padding:5px;text-align:center">${x.art}</td>
+    <td style="border:1px solid #aaa;padding:5px;text-align:center">шт.</td>
+    <td style="border:1px solid #aaa;padding:5px;text-align:right">${x.qty}</td>
+    <td style="border:1px solid #aaa;padding:5px;text-align:right">${x.price.toLocaleString("ru-RU")}</td>
+    <td style="border:1px solid #aaa;padding:5px;text-align:right;font-weight:700">${(x.price*x.qty).toLocaleString("ru-RU")}</td>
+  </tr>`).join("");
+  const invHtml=`<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"><title>Счёт на оплату</title>
+  <style>body{font-family:Arial,sans-serif;font-size:12px;margin:20px;color:#000}
+  .goods-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:11px}
+  .goods-table th{border:1px solid #aaa;padding:5px;background:#e8e8e8;text-align:center}
+  .bank-table{width:100%;border-collapse:collapse;margin-bottom:8px}
+  .bank-table td{border:1px solid #aaa;padding:4px 8px;vertical-align:top}
+  .bank-table td.label{background:#f0f0f0;width:140px;font-weight:700}
+  .totals-row{display:flex;justify-content:flex-end;gap:30px;margin:4px 0}
+  .totals-row.bold{font-weight:700;font-size:13px}
+  .sig-row{display:flex;gap:40px;margin-top:30px;align-items:flex-end}
+  .sig-block{flex:1;border-top:1px solid #000;padding-top:4px;text-align:center;font-size:11px}
+  .stamp{width:80px;height:80px;border:1px solid #ccc;border-radius:50%;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;color:#ccc;font-size:10px}
+  @media print{body{margin:0}}</style></head><body>
+  <div style="border:2px solid #000;padding:10px;margin-bottom:10px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div>
+        <div style="font-size:11px;color:#555">Поставщик:</div>
+        <div style="font-weight:700;font-size:13px">ООО «Физиотехника»</div>
+        <div style="font-size:11px">ИНН: 4720033840 &nbsp;|&nbsp; КПП: 472001001</div>
+        <div style="font-size:11px">188662, Ленинградская обл., Всеволожский р-н, г. Сертолово, ул. Центральная, д. 11</div>
+        <div style="font-size:11px">Тел: +7 (812) 321-67-80 &nbsp;|&nbsp; info@pt-med.ru</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:11px;color:#555">Расчётный счёт:</div>
+        <div style="font-weight:700">______________________________</div>
+        <div style="font-size:11px">Банк: ______________________________</div>
+        <div style="font-size:11px">БИК: _____________ &nbsp;|&nbsp; Корр. счёт: ______________________</div>
+      </div>
+    </div>
+  </div>
+  <div style="font-size:16px;font-weight:700;margin:10px 0 6px">Счёт на оплату № ______ от ${date}</div>
+  <table class="bank-table" style="margin-bottom:4px">
+    <tr><td class="label">Покупатель:</td><td>_______________________________________________</td></tr>
+    <tr><td class="label">ИНН / КПП:</td><td>_______________________</td></tr>
+    <tr><td class="label">Адрес:</td><td>_______________________________________________</td></tr>
+    <tr><td class="label">Договор:</td><td>№ _____________ от _____________</td></tr>
+  </table>
+  <table class="goods-table"><thead><tr>
+    <th style="width:30px">№</th><th>Наименование товара</th><th style="width:110px">Артикул</th>
+    <th style="width:40px">Ед.</th><th style="width:50px">Кол-во</th>
+    <th style="width:90px">Цена, руб.</th><th style="width:100px">Сумма, руб.</th>
+  </tr></thead><tbody>${rowsHtml}</tbody></table>
+  <div class="totals-row"><span>Сумма без НДС:</span><span>${net.toLocaleString("ru-RU")} руб.</span></div>
+  <div class="totals-row"><span>НДС 5%:</span><span>${vat.toLocaleString("ru-RU")} руб.</span></div>
+  <div class="totals-row bold"><span>Итого к оплате:</span><span>${total.toLocaleString("ru-RU")} руб.</span></div>
+  <div style="margin-top:8px;font-size:11px">
+    <strong>Итого наименований ${items.length}, на сумму ${total.toLocaleString("ru-RU")} (${numWords(total)}) рублей 00 копеек.</strong><br>
+    НДС 5% — ${vat.toLocaleString("ru-RU")} (${numWords(vat)}) рублей 00 копеек.
+  </div>
+  <div class="sig-row">
+    <div class="sig-block"><div class="stamp">М.П.</div>Руководитель</div>
+    <div class="sig-block" style="flex:2;border:none"></div>
+    <div class="sig-block">Главный бухгалтер</div>
+  </div>
+  <script>window.onload=function(){setTimeout(function(){window.print();},600);};<\/script>
+  </body></html>`;
+  const w=window.open("","_blank");
+  w.document.write(invHtml);
+  w.document.close();
+}
+
+// NUMBER TO WORDS
+function numWords(n){
+  if(n===0) return "ноль";
+  const units=["","один","два","три","четыре","пять","шесть","семь","восемь","девять","десять","одиннадцать","двенадцать","тринадцать","четырнадцать","пятнадцать","шестнадцать","семнадцать","восемнадцать","девятнадцать"];
+  const tens=["","","двадцать","тридцать","сорок","пятьдесят","шестьдесят","семьдесят","восемьдесят","девяносто"];
+  const hunds=["","сто","двести","триста","четыреста","пятьсот","шестьсот","семьсот","восемьсот","девятьсот"];
+  function group(n,fem){let s="";if(n>=100)s+=hunds[Math.floor(n/100)]+" ";n=n%100;if(n>=20){s+=tens[Math.floor(n/10)]+" ";n=n%10;}if(n>0){if(fem&&n===1)s+="одна ";else if(fem&&n===2)s+="две ";else s+=units[n]+" ";}return s.trim();}
+  function mln(n){const r=n%10,r100=n%100;if(r100>=11&&r100<=19)return"миллионов";if(r===1)return"миллион";if(r>=2&&r<=4)return"миллиона";return"миллионов";}
+  function tys(n){const r=n%10,r100=n%100;if(r100>=11&&r100<=19)return"тысяч";if(r===1)return"тысяча";if(r>=2&&r<=4)return"тысячи";return"тысяч";}
+  let result="";
+  const m=Math.floor(n/1000000);if(m>0)result+=group(m,false)+" "+mln(m)+" ";
+  const t=Math.floor((n%1000000)/1000);if(t>0)result+=group(t,true)+" "+tys(t)+" ";
+  const u=n%1000;if(u>0)result+=group(u,false);
+  return result.trim();
+}
+
+// PRODUCT CARD MODAL
+function openCard(art, name, price, model){
+  document.getElementById("modalImg").src = imgFile(art);
+  document.getElementById("modalImg").alt = name;
+  document.getElementById("modalName").textContent = name;
+  document.getElementById("modalArt").textContent = "Арт. " + art;
+  const modelEl = document.getElementById("modalModel");
+  if(model){ modelEl.textContent = model; modelEl.style.display = "inline-block"; }
+  else { modelEl.style.display = "none"; }
+  const priceEl = document.getElementById("modalPrice");
+  if(price !== null && price !== "null"){
+    priceEl.className = "modal-price";
+    priceEl.textContent = Number(price).toLocaleString("ru-RU") + " &#8381;";
+    priceEl.innerHTML = Number(price).toLocaleString("ru-RU") + " &#8381;";
+  } else {
+    priceEl.className = "modal-price no-price";
+    priceEl.textContent = "Цена по запросу";
+  }
+  document.getElementById("modalOverlay").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+function closeCard(){
+  document.getElementById("modalOverlay").classList.remove("open");
+  document.body.style.overflow = "";
+}
+document.addEventListener("keydown", e=>{ if(e.key==="Escape") closeCard(); });
+
+// Init
+applySort([...rawData]);
+</script>
+
+<!-- PRODUCT CARD MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeCard()">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeCard()">&#10005;</button>
+    <div class="modal-img-wrap">
+      <img id="modalImg" src="" alt="">
+    </div>
+    <div class="modal-body">
+      <div class="modal-name" id="modalName"></div>
+      <div class="modal-art" id="modalArt"></div>
+      <div class="modal-model" id="modalModel"></div>
+      <div id="modalPrice"></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
