@@ -14,10 +14,11 @@ Java (без внешних зависимостей), запускается н
 
 ## Сборка
 
-Требуется JDK 8+.
+Требуется JDK 8+. Jar собран с `--release 8`, поэтому запускается на любой
+JVM начиная с Java 8 (включая старые окружения вроде Java 8u).
 
 ```bash
-javac -d out src/CpuMflops.java
+javac --release 8 -d out src/CpuMflops.java
 printf 'Main-Class: CpuMflops\n' > manifest.txt
 jar cfm cpu-mflops-benchmark.jar manifest.txt -C out .
 ```
