@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>График отпусков</title>
+<style>
+:root{--navy:#1F4E78;--navy-light:#2E6DA4;--bg:#f4f6f8;--border:#d5dbe0;--green:#C6E0B4;--yellow:#FFE699;--red:#F8CBAD;--blue:#B4C6E7;}
+*{box-sizing:border-box;font-family:"Segoe UI",Arial,sans-serif;}
+body{margin:0;background:var(--bg);color:#222;}
+header{background:var(--navy);color:#fff;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+header h1{font-size:18px;margin:0;}
+.sync{font-size:12px;opacity:.9;}
+.sync.bad{color:#ffb3b3;font-weight:600;opacity:1;}
+nav{display:flex;gap:6px;flex-wrap:wrap;}
+nav button{background:var(--navy-light);color:#fff;border:none;padding:8px 14px;border-radius:6px;cursor:pointer;font-size:13px;}
+nav button.active{background:#fff;color:var(--navy);font-weight:600;}
+main{padding:16px 20px;max-width:1600px;margin:0 auto;}
+.card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:16px;}
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px;}
+select,input[type=text],input[type=number]{padding:6px 8px;border:1px solid var(--border);border-radius:5px;font-size:13px;}
+button.btn{background:var(--navy);color:#fff;border:none;padding:7px 14px;border-radius:5px;cursor:pointer;font-size:13px;}
+button.btn.secondary{background:#fff;color:var(--navy);border:1px solid var(--navy);}
+button.btn.danger{background:#e05252;}
+button.btn.tiny{padding:4px 8px;font-size:11px;}
+button.btn:hover{opacity:.9;}
+a.download-link{display:none;background:#3a9d5d;color:#fff;padding:8px 14px;border-radius:5px;text-decoration:none;font-size:13px;font-weight:600;}
+a.download-link.ready{display:inline-block;}
+table{border-collapse:collapse;width:100%;font-size:12.5px;}
+th,td{border:1px solid var(--border);padding:5px 7px;text-align:left;}
+th{background:#eef2f6;position:sticky;top:0;}
+tbody tr:hover{background:#f7fafc;}
+.tab-content{display:none;}.tab-content.active{display:block;}
+.calendar-wrap{overflow:auto;border:1px solid var(--border);border-radius:6px;max-height:70vh;}
+.cal-table{border-collapse:collapse;font-size:11px;width:auto;}
+.cal-table th,.cal-table td{border:1px solid #e5e9ed;padding:2px;text-align:center;}
+.cal-table th.month{background:var(--navy);color:#fff;}
+.cal-table td.day-cell{cursor:pointer;user-select:none;width:20px;height:20px;min-width:20px;}
+.cal-table td.day-cell.weekend{background:#f5f5f5;}
+.cal-table td.day-cell.selected{background:#9fc5e8 !important;}
+.cal-table td.day-cell.code-O{background:var(--green);}.cal-table td.day-cell.code-D{background:var(--yellow);}
+.cal-table td.day-cell.code-B{background:var(--red);}.cal-table td.day-cell.code-U{background:var(--blue);}
+.cal-table td.name-cell{position:sticky;left:0;background:#fff;text-align:left;min-width:220px;font-size:12px;z-index:2;}
+.cal-table th.name-cell{position:sticky;left:0;background:#eef2f6;z-index:3;min-width:220px;text-align:left;}
+.cal-table tr.subunit-header td{background:#dbe6f0;font-weight:700;color:var(--navy);position:sticky;left:0;text-align:left;padding:5px 8px;}
+.legend{display:flex;gap:14px;margin-bottom:10px;font-size:12px;flex-wrap:wrap;}
+.legend i{width:14px;height:14px;border-radius:3px;display:inline-block;margin-right:4px;vertical-align:middle;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);align-items:center;justify-content:center;z-index:50;}
+.modal-overlay.active{display:flex;}
+.modal{background:#fff;border-radius:8px;padding:20px;width:440px;max-width:92vw;}
+.modal h3{margin-top:0;}
+.modal label{display:block;font-size:12px;margin:10px 0 4px;font-weight:600;}
+.modal input,.modal select{width:100%;}
+.modal .actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;}
+.exceed-row{background:#fde2e2 !important;}.warn-row{background:#fff3cd !important;}
+.small{font-size:11px;color:#666;}
+.dept-tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+.dept-tabs button{border:1px solid var(--navy);background:#fff;color:var(--navy);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12.5px;}
+.dept-tabs button.active{background:var(--navy);color:#fff;}
+#toast{position:fixed;bottom:20px;right:20px;background:#333;color:#fff;padding:10px 16px;border-radius:6px;display:none;z-index:100;font-size:13px;max-width:420px;}
+.confirm-delete-cell{display:flex;gap:5px;align-items:center;flex-wrap:wrap;}
+.export-block{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px;}
+hr.export-divider{border:none;border-top:1px solid var(--border);margin:14px 0;}
+</style>
+</head>
+<body>
+<header>
+  <h1>График отпусков — 2027 год</h1>
+  <span class="sync" id="syncStatus">Загрузка данных с сервера…</span>
+  <nav>
+    <button data-tab="employees" class="active">Сотрудники</button>
+    <button data-tab="calendar">Календарь отпусков</button>
+    <button data-tab="summary">Свод пересечений</button>
+    <button data-tab="export">Экспорт</button>
+  </nav>
+</header>
+<main>
+
+<div class="tab-content active" id="tab-employees"><div class="card">
+  <div class="toolbar">
+    <select id="empDeptFilter"><option value="">Все подразделения (крупные)</option></select>
+    <select id="empSubunitFilter"><option value="">Все подразделения (детально)</option></select>
+    <select id="empSortSelect">
+      <option value="dept">Сортировка: крупное подразделение</option>
+      <option value="subunit">Сортировка: детальное подразделение</option>
+      <option value="fio">Сортировка: ФИО</option>
+    </select>
+    <input type="text" id="empSearch" placeholder="Поиск по ФИО или должности...">
+    <button class="btn" id="btnAddEmployee">+ Добавить сотрудника</button>
+    <span class="small" id="empCount"></span>
+  </div>
+  <div style="max-height:65vh;overflow:auto;">
+    <table id="empTable">
+      <thead><tr><th>№</th><th>Подразделение</th><th>Детальное подразделение</th><th>ФИО</th><th>Должность</th><th>Смежная группа</th><th>Дней отпуска</th><th>Действия</th></tr></thead>
+      <tbody id="empTableBody"></tbody>
+    </table>
+  </div>
+</div></div>
+
+<div class="tab-content" id="tab-calendar"><div class="card">
+  <div class="legend">
+    <span><i style="background:#C6E0B4"></i>О — основной отпуск</span>
+    <span><i style="background:#FFE699"></i>Д — доп. отпуск</span>
+    <span><i style="background:#F8CBAD"></i>Б — больничный/иное</span>
+    <span><i style="background:#B4C6E7"></i>У — учебный отпуск</span>
+  </div>
+  <div class="dept-tabs" id="calDeptTabs"></div>
+  <div class="toolbar">
+    <select id="calSubunitFilter"><option value="">Все детальные подразделения</option></select>
+    <select id="calSortSelect">
+      <option value="subunit">Группировать по детальному подразделению</option>
+      <option value="fio">Сортировать только по ФИО</option>
+    </select>
+  </div>
+  <div class="toolbar">
+    <span class="small">Выделите диапазон дней мышью в одной строке, затем выберите код и нажмите «Применить».</span>
+    <select id="calCodeSelect">
+      <option value="О">О — основной отпуск</option>
+      <option value="Д">Д — доп. отпуск</option>
+      <option value="Б">Б — больничный/иное</option>
+      <option value="У">У — учебный отпуск</option>
+      <option value="">— очистить —</option>
+    </select>
+    <button class="btn" id="btnApplyCode">Применить к выделению</button>
+    <button class="btn secondary" id="btnClearSelection">Сбросить выделение</button>
+  </div>
+  <div class="calendar-wrap"><table class="cal-table" id="calTable"></table></div>
+</div></div>
+
+<div class="tab-content" id="tab-summary"><div class="card">
+  <div class="toolbar"><span class="small">Смежная группа определяется по функции должности. Порог (по умолчанию 2 чел.) хранится на сервере и общий для всех. Превышение — красным.</span></div>
+  <div style="max-height:70vh;overflow:auto;">
+    <table id="summaryTable">
+      <thead><tr><th>Смежная группа (функциональная)</th><th>Кол-во чел.</th><th>Порог, чел.</th><th>Макс. одновременно</th><th>Дней с превышением</th><th>Периоды превышения</th></tr></thead>
+      <tbody id="summaryTableBody"></tbody>
+    </table>
+  </div>
+</div></div>
+
+<div class="tab-content" id="tab-export">
+  <div class="card">
+    <h3>Выгрузка графика отпусков по подразделению (Word)</h3>
+    <p class="small">Ведомость по месяцам: ФИО — дата начала отпуска — количество календарных дней. Выбор — по детальному подразделению (кабинету/отделению).</p>
+    <div class="toolbar">
+      <select id="exportSubunitSelect"></select>
+      <button class="btn" id="btnPrepareWord">Подготовить файл по одному подразделению</button>
+    </div>
+    <div class="export-block">
+      <a href="#" class="download-link" id="wordDownloadLink" download="">Скачать подготовленный файл .doc</a>
+      <span class="small" id="wordExportStatus"></span>
+    </div>
+    <hr class="export-divider">
+    <p class="small"><b>Выгрузка сразу по всем подразделениям</b> — один файл, каждое подразделение на отдельной странице.</p>
+    <div class="toolbar"><button class="btn" id="btnPrepareWordAll">Подготовить файл по всем подразделениям</button></div>
+    <div class="export-block">
+      <a href="#" class="download-link" id="wordAllDownloadLink" download="">Скачать файл по всем подразделениям .doc</a>
+      <span class="small" id="wordAllExportStatus"></span>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Выгрузка сводных данных (Excel)</h3>
+    <p class="small">Периоды отпусков по каждому крупному отделению (отдельные листы) и сводная таблица пересечений.</p>
+    <button class="btn" id="btnPrepareExcel">Подготовить файл Excel</button>
+    <div class="export-block">
+      <a href="#" class="download-link" id="excelDownloadLink" download="">Скачать подготовленный файл .xls</a>
+      <span class="small" id="excelExportStatus"></span>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Резервная копия</h3>
+    <p class="small">Все данные хранятся на сервере, а сервер сам делает ежедневные копии базы. Файл ниже — дополнительная копия «на руки»; его же можно загрузить обратно (это заменит ВСЕ данные на сервере).</p>
+    <div class="toolbar">
+      <a href="/api/backup" class="download-link ready" download>Скачать резервную копию (.json)</a>
+      <input type="file" id="restoreFileInput" accept=".json" style="display:none">
+      <button class="btn secondary" id="btnRestoreJson">Загрузить резервную копию…</button>
+    </div>
+    <div class="export-block" id="restoreConfirmBox" style="display:none;">
+      <span class="small" id="restoreFileName"></span>
+      <span class="small"><b>Заменить ВСЕ данные на сервере содержимым этого файла?</b></span>
+      <button class="btn danger tiny" id="btnRestoreYes">Да, заменить</button>
+      <button class="btn secondary tiny" id="btnRestoreNo">Отмена</button>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<div class="modal-overlay" id="empModal"><div class="modal">
+  <h3 id="empModalTitle">Добавить сотрудника</h3>
+  <input type="hidden" id="empModalId">
+  <label>Подразделение (крупное)</label><select id="empModalDept"></select>
+  <label>Детальное подразделение</label>
+  <input type="text" id="empModalSubunit" list="subunitsList"><datalist id="subunitsList"></datalist>
+  <label>ФИО</label><input type="text" id="empModalFio">
+  <label>Должность</label><input type="text" id="empModalJob">
+  <label>Смежная группа (если оставить пустой — определится по должности)</label>
+  <input type="text" id="empModalGroup" list="groupsList"><datalist id="groupsList"></datalist>
+  <div class="actions">
+    <button class="btn secondary" id="empModalCancel">Отмена</button>
+    <button class="btn" id="empModalSave">Сохранить</button>
+  </div>
+</div></div>
+
+<div id="toast"></div>
+<script>
+"use strict";
+var YEAR = 2027, TOTAL_DAYS = 365;
+var CODE_LABELS = {O:"Основной", D:"Доп.", B:"Больничный", U:"Учебный"};
+var CODE_MAP_RU = {"О":"O","Д":"D","Б":"B","У":"U"};
+var MONTHS_RU_FULL = ["ЯНВАРЬ","ФЕВРАЛЬ","МАРТ","АПРЕЛЬ","МАЙ","ИЮНЬ","ИЮЛЬ","АВГУСТ","СЕНТЯБРЬ","ОКТЯБРЬ","НОЯБРЬ","ДЕКАБРЬ"];
+var MONTHS_RU = ["Янв","Фев","Мар","Апр","Май","Июн","Июл","Авг","Сен","Окт","Ноя","Дек"];
+var NO_SUBUNIT_LABEL = "Без детального подразделения";
+var POLL_MS = 15000;
+
+var DATA = null, REV = null, CURRENT_USER = "", groupThresholds = {};
+var busy = false, appStarted = false;
+var currentDeptFilter = "", currentSubunitFilter = "", currentSort = "dept";
+var currentCalDept = null, currentCalSubunitFilter = "", currentCalSort = "subunit";
+var isSelecting = false, selectionStartDay = null, selectionEmpId = null, selectedDays = [];
+var pendingDeleteId = null, pendingRestore = null;
+
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s == null ? "" : s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function daysInYear(y){ return ((y%4===0 && (y%100!==0 || y%400===0)) ? 366 : 365); }
+function pad2(n){ return (n<10?"0":"")+n; }
+function dateFromDayIndex(idx){ var d = new Date(YEAR,0,1); d.setDate(d.getDate()+idx); return d; }
+function isoFromDayIndex(idx){ var d = dateFromDayIndex(idx); return d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate()); }
+function dayIndexFromDate(s){ var p = s.split("-"); return Math.round((new Date(+p[0], +p[1]-1, +p[2]) - new Date(YEAR,0,1))/86400000); }
+function monthIndexFromDate(s){ return parseInt(s.split("-")[1])-1; }
+function fmtDate(s){ var p = s.split("-"); return p[2]+"."+p[1]+"."+p[0]; }
+function periodDays(p){ return dayIndexFromDate(p.end) - dayIndexFromDate(p.start) + 1; }
+function countVacationDays(emp){
+  var t = 0;
+  for(var i=0;i<emp.periods.length;i++){ var p = emp.periods[i]; if(p.type==="О" || p.type==="Д") t += periodDays(p); }
+  return t;
+}
+function findEmployeeIndex(id){
+  for(var i=0;i<DATA.employees.length;i++){ if(DATA.employees[i].id===id) return i; }
+  return -1;
+}
+function toast(msg){
+  var t = $("toast"); t.textContent = msg; t.style.display = "block";
+  clearTimeout(toast._t); toast._t = setTimeout(function(){ t.style.display = "none"; }, 3500);
+}
+
+// ---------------------------------------------------------------- связь с сервером
+function api(method, url, body){
+  var opts = {method: method, headers: {}, credentials: "same-origin", cache: "no-store"};
+  if(body !== undefined){ opts.headers["Content-Type"] = "application/json"; opts.body = JSON.stringify(body); }
+  return fetch(url, opts).then(function(r){
+    return r.json().catch(function(){ return {}; }).then(function(j){
+      if(!r.ok){
+        var err = new Error(j.error || ("Ошибка сервера (HTTP " + r.status + ")"));
+        err.status = r.status; err.payload = j; throw err;
+      }
+      return j;
+    });
+  });
+}
+function setSyncStatus(ok){
+  var el = $("syncStatus"), d = new Date();
+  if(ok){
+    el.className = "sync";
+    el.textContent = "● Синхронизировано с сервером " + pad2(d.getHours()) + ":" + pad2(d.getMinutes()) + (CURRENT_USER && CURRENT_USER !== "anonymous" ? " · " + CURRENT_USER : "");
+  } else {
+    el.className = "sync bad";
+    el.textContent = "● Нет связи с сервером — изменения не сохраняются";
+  }
+}
+function applyRev(r){ if(r && typeof r.rev === "number" && REV !== null && r.rev === REV + 1) REV = r.rev; }
+function loadAll(){
+  return api("GET", "/api/data").then(function(d){
+    DATA = d; YEAR = d.year; TOTAL_DAYS = daysInYear(YEAR);
+    REV = d.rev; CURRENT_USER = d.user; groupThresholds = d.thresholds || {};
+    setSyncStatus(true);
+  });
+}
+function handleApiError(err){
+  if(err && err.status === 409){
+    toast("Запись только что изменил другой пользователь — данные обновлены, повторите действие.");
+    return loadAll().then(function(){ pendingDeleteId = null; refreshAll(); });
+  }
+  if(err && err.status === 404){
+    toast(err.message);
+    return loadAll().then(function(){ refreshAll(); });
+  }
+  if(err && err.status === 401){ toast("Нет доступа: войдите заново (обновите страницу)."); return Promise.resolve(); }
+  if(err instanceof TypeError){ setSyncStatus(false); toast("Нет связи с сервером. Изменение НЕ сохранено."); return Promise.resolve(); }
+  toast("Ошибка: " + (err && err.message ? err.message : err));
+  return Promise.resolve();
+}
+function pollRev(){
+  if(busy || isSelecting || !DATA || $("empModal").classList.contains("active")) return;
+  api("GET", "/api/rev").then(function(r){
+    if(r.rev !== REV){
+      return loadAll().then(function(){ pendingDeleteId = null; refreshAll(); toast("Данные обновлены: внесены изменения другим пользователем."); });
+    }
+    setSyncStatus(true);
+  }).catch(function(){ setSyncStatus(false); });
+}
+function withBusy(fn){   // resolves true при успехе и false при ошибке (ошибка уже показана пользователю)
+  busy = true;
+  return Promise.resolve().then(fn).then(function(){ busy = false; return true; }, function(err){
+    busy = false;
+    return handleApiError(err).then(function(){ return false; });
+  });
+}
+
+// ---------------------------------------------------------------- селекторы
+function getUsedSubunits(){
+  var used = {}, hasEmpty = false;
+  for(var i=0;i<DATA.employees.length;i++){ var su = DATA.employees[i].subunit; if(su) used[su] = true; else hasEmpty = true; }
+  var list = Object.keys(used).sort(function(a,b){ return a.localeCompare(b,"ru"); });
+  if(hasEmpty) list.push(NO_SUBUNIT_LABEL);
+  return list;
+}
+function fillSelect(sel, items, firstOpt, keepValue){
+  var prev = keepValue;
+  var html = firstOpt ? "<option value=\"\">" + esc(firstOpt) + "</option>" : "";
+  for(var i=0;i<items.length;i++){ html += "<option value=\"" + esc(items[i].v) + "\">" + esc(items[i].t) + "</option>"; }
+  sel.innerHTML = html;
+  var ok = false;
+  for(var j=0;j<items.length;j++){ if(items[j].v === prev) ok = true; }
+  sel.value = ok ? prev : "";
+  return sel.value;
+}
+function fillDatalist(el, values){
+  var html = "";
+  for(var i=0;i<values.length;i++){ html += "<option value=\"" + esc(values[i]) + "\"></option>"; }
+  el.innerHTML = html;
+}
+function allSubunitsForPick(){
+  var seen = {}, list = [];
+  var src = DATA.subunits.concat(getUsedSubunits());
+  for(var i=0;i<src.length;i++){ if(src[i] !== NO_SUBUNIT_LABEL && !seen[src[i]]){ seen[src[i]] = true; list.push(src[i]); } }
+  return list.sort(function(a,b){ return a.localeCompare(b,"ru"); });
+}
+function initStaticSelectors(){
+  var deps = [];
+  for(var i=0;i<DATA.departments.length;i++){ deps.push({v: DATA.departments[i], t: DATA.deptLabels[DATA.departments[i]] || DATA.departments[i]}); }
+  fillSelect($("empDeptFilter"), deps, "Все подразделения (крупные)", "");
+  fillSelect($("empModalDept"), deps, "", DATA.departments[0]);
+  var tabs = $("calDeptTabs"); tabs.innerHTML = "";
+  deps.forEach(function(d){
+    var b = document.createElement("button");
+    b.textContent = d.t; b.setAttribute("data-dept", d.v);
+    b.addEventListener("click", function(){
+      currentCalDept = d.v; currentCalSubunitFilter = "";
+      renderDeptTabs(); renderCalSubunitOptions(); renderCalendar();
+    });
+    tabs.appendChild(b);
+  });
+  currentCalDept = DATA.departments[0];
+}
+function refreshSelectors(){
+  var subs = allSubunitsForPick();
+  currentSubunitFilter = fillSelect($("empSubunitFilter"), subs.map(function(s){ return {v:s, t:s}; }), "Все подразделения (детально)", currentSubunitFilter);
+  fillDatalist($("subunitsList"), subs);
+  fillDatalist($("groupsList"), DATA.relatedGroups);
+  renderCalSubunitOptions();
+  renderExportSubunitOptions();
+  renderDeptTabs();
+}
+function renderCalSubunitOptions(){
+  var used = {};
+  for(var i=0;i<DATA.employees.length;i++){ var e = DATA.employees[i]; if(e.dept === currentCalDept && e.subunit) used[e.subunit] = true; }
+  var list = Object.keys(used).sort(function(a,b){ return a.localeCompare(b,"ru"); }).map(function(s){ return {v:s, t:s}; });
+  currentCalSubunitFilter = fillSelect($("calSubunitFilter"), list, "Все детальные подразделения", currentCalSubunitFilter);
+}
+function renderExportSubunitOptions(){
+  var sel = $("exportSubunitSelect");
+  var list = getUsedSubunits().map(function(s){ return {v:s, t:s}; });
+  var v = fillSelect(sel, list, "", sel.value);
+  if(!v && list.length){ sel.value = list[0].v; }
+}
+function renderDeptTabs(){
+  var buttons = $("calDeptTabs").querySelectorAll("button");
+  for(var i=0;i<buttons.length;i++){
+    if(buttons[i].getAttribute("data-dept") === currentCalDept) buttons[i].classList.add("active"); else buttons[i].classList.remove("active");
+  }
+}
+function refreshAll(){
+  refreshSelectors();
+  renderEmployeeTable(); renderCalendar(); renderSummary();
+}
+
+// ---------------------------------------------------------------- сотрудники
+function renderEmployeeTable(){
+  var search = $("empSearch").value.trim().toLowerCase();
+  var list = [];
+  for(var i=0;i<DATA.employees.length;i++){
+    var e = DATA.employees[i];
+    if(currentDeptFilter && e.dept !== currentDeptFilter) continue;
+    if(currentSubunitFilter && (e.subunit || NO_SUBUNIT_LABEL) !== currentSubunitFilter) continue;
+    if(search && (e.fio + " " + e.job).toLowerCase().indexOf(search) === -1) continue;
+    list.push(e);
+  }
+  if(currentSort === "fio"){ list.sort(function(a,b){ return a.fio.localeCompare(b.fio,"ru"); }); }
+  else if(currentSort === "subunit"){
+    list.sort(function(a,b){
+      var s1 = a.subunit || NO_SUBUNIT_LABEL, s2 = b.subunit || NO_SUBUNIT_LABEL;
+      return s1 !== s2 ? s1.localeCompare(s2,"ru") : a.fio.localeCompare(b.fio,"ru");
+    });
+  } else {
+    list.sort(function(a,b){ return a.dept !== b.dept ? a.dept.localeCompare(b.dept) : a.fio.localeCompare(b.fio,"ru"); });
+  }
+  var html = "";
+  for(var k=0;k<list.length;k++){
+    var emp = list[k], id = emp.id;
+    html += "<tr><td>" + (k+1) + "</td><td>" + esc(DATA.deptLabels[emp.dept] || emp.dept) + "</td><td>" + esc(emp.subunit) + "</td>";
+    html += "<td>" + esc(emp.fio) + "</td><td>" + esc(emp.job) + "</td><td>" + esc(emp.group) + "</td><td>" + countVacationDays(emp) + "</td><td>";
+    if(pendingDeleteId === id){
+      html += "<div class=\"confirm-delete-cell\"><span class=\"small\">Удалить безвозвратно?</span>";
+      html += "<button class=\"btn danger tiny\" data-action=\"confirm-delete\" data-id=\"" + id + "\">Да, удалить</button>";
+      html += "<button class=\"btn secondary tiny\" data-action=\"cancel-delete\" data-id=\"" + id + "\">Отмена</button></div>";
+    } else {
+      html += "<button class=\"btn secondary tiny\" data-action=\"edit\" data-id=\"" + id + "\">Изм.</button> ";
+      html += "<button class=\"btn danger tiny\" data-action=\"delete\" data-id=\"" + id + "\">Удал.</button>";
+    }
+    html += "</td></tr>";
+  }
+  $("empTableBody").innerHTML = html;
+  $("empCount").textContent = "Всего: " + list.length + " сотрудник(ов)";
+}
+function handleEmpTableClick(ev){
+  var btn = ev.target.closest("button[data-action]");
+  if(!btn) return;
+  var action = btn.getAttribute("data-action"), id = parseInt(btn.getAttribute("data-id"));
+  if(action === "edit") openEditEmployee(id);
+  else if(action === "delete"){ pendingDeleteId = id; renderEmployeeTable(); }
+  else if(action === "cancel-delete"){ pendingDeleteId = null; renderEmployeeTable(); }
+  else if(action === "confirm-delete") performDeleteEmployee(id);
+}
+function openAddEmployee(){
+  $("empModalTitle").textContent = "Добавить сотрудника";
+  $("empModalId").value = "";
+  $("empModalDept").value = currentDeptFilter || DATA.departments[0];
+  $("empModalSubunit").value = currentSubunitFilter === NO_SUBUNIT_LABEL ? "" : (currentSubunitFilter || "");
+  $("empModalFio").value = ""; $("empModalJob").value = ""; $("empModalGroup").value = "";
+  $("empModal").classList.add("active");
+}
+function openEditEmployee(id){
+  var idx = findEmployeeIndex(id); if(idx === -1) return;
+  var e = DATA.employees[idx];
+  $("empModalTitle").textContent = "Изменить сотрудника";
+  $("empModalId").value = id; $("empModalDept").value = e.dept; $("empModalSubunit").value = e.subunit || "";
+  $("empModalFio").value = e.fio; $("empModalJob").value = e.job; $("empModalGroup").value = e.group || "";
+  $("empModal").classList.add("active");
+}
+function closeEmpModal(){ $("empModal").classList.remove("active"); }
+function saveEmployeeModal(){
+  var idVal = $("empModalId").value;
+  var payload = {dept: $("empModalDept").value, subunit: $("empModalSubunit").value.trim(), fio: $("empModalFio").value.trim(),
+                 job: $("empModalJob").value.trim(), group: $("empModalGroup").value.trim()};
+  if(!payload.fio){ toast("Укажите ФИО сотрудника"); return; }
+  withBusy(function(){
+    if(idVal){
+      var idx = findEmployeeIndex(parseInt(idVal));
+      if(idx === -1) throw new Error("Сотрудник не найден");
+      payload.version = DATA.employees[idx].version;
+      return api("PUT", "/api/employees/" + idVal, payload).then(function(r){
+        DATA.employees[idx] = r.employee; applyRev(r); toast("Изменения сохранены");
+      });
+    }
+    return api("POST", "/api/employees", payload).then(function(r){
+      DATA.employees.push(r.employee); applyRev(r); toast("Сотрудник добавлен");
+    });
+  }).then(function(ok){
+    if(!ok) return;
+    closeEmpModal();
+    return api("GET", "/api/data").then(function(d){ DATA.relatedGroups = d.relatedGroups; }).catch(function(){}).then(refreshAll);
+  });
+}
+function performDeleteEmployee(id){
+  withBusy(function(){
+    return api("DELETE", "/api/employees/" + id).then(function(r){
+      var idx = findEmployeeIndex(id); if(idx !== -1) DATA.employees.splice(idx, 1);
+      pendingDeleteId = null; applyRev(r); toast("Сотрудник удалён");
+    });
+  }).then(function(){ pendingDeleteId = null; refreshAll(); });
+}
+
+// ---------------------------------------------------------------- календарь
+function getEmployeeDayCode(emp, dayIdx){
+  for(var i=0;i<emp.periods.length;i++){
+    var p = emp.periods[i];
+    if(dayIdx >= dayIndexFromDate(p.start) && dayIdx <= dayIndexFromDate(p.end)) return p.type;
+  }
+  return "";
+}
+function mergePeriods(emp){
+  var byType = {};
+  for(var i=0;i<emp.periods.length;i++){
+    var p = emp.periods[i];
+    (byType[p.type] = byType[p.type] || []).push([dayIndexFromDate(p.start), dayIndexFromDate(p.end)]);
+  }
+  var merged = [];
+  for(var type in byType){
+    var ranges = byType[type].sort(function(a,b){ return a[0]-b[0]; });
+    var cur = ranges[0];
+    for(var k=1;k<ranges.length;k++){
+      if(ranges[k][0] <= cur[1]+1) cur[1] = Math.max(cur[1], ranges[k][1]);
+      else { merged.push([cur[0],cur[1],type]); cur = ranges[k]; }
+    }
+    if(cur) merged.push([cur[0],cur[1],type]);
+  }
+  merged.sort(function(a,b){ return a[0]-b[0]; });
+  emp.periods = merged.map(function(m){ return {start: isoFromDayIndex(m[0]), end: isoFromDayIndex(m[1]), type: m[2]}; });
+}
+function setEmployeeDayCode(emp, dayIdx, code){
+  var np = [];
+  for(var i=0;i<emp.periods.length;i++){
+    var p = emp.periods[i], s = dayIndexFromDate(p.start), en = dayIndexFromDate(p.end);
+    if(dayIdx < s || dayIdx > en){ np.push(p); continue; }
+    if(s === en) continue;
+    if(dayIdx === s){ np.push({start: isoFromDayIndex(s+1), end: p.end, type: p.type}); continue; }
+    if(dayIdx === en){ np.push({start: p.start, end: isoFromDayIndex(en-1), type: p.type}); continue; }
+    np.push({start: p.start, end: isoFromDayIndex(dayIdx-1), type: p.type});
+    np.push({start: isoFromDayIndex(dayIdx+1), end: p.end, type: p.type});
+  }
+  emp.periods = np;
+  if(code) emp.periods.push({start: isoFromDayIndex(dayIdx), end: isoFromDayIndex(dayIdx), type: code});
+  mergePeriods(emp);
+}
+function renderCalendar(){
+  var list = [];
+  for(var i=0;i<DATA.employees.length;i++){
+    var e = DATA.employees[i];
+    if(e.dept !== currentCalDept) continue;
+    if(currentCalSubunitFilter && e.subunit !== currentCalSubunitFilter) continue;
+    list.push(e);
+  }
+  var grouped = (currentCalSort === "subunit");
+  list.sort(function(a,b){
+    if(grouped){
+      var s1 = a.subunit || NO_SUBUNIT_LABEL, s2 = b.subunit || NO_SUBUNIT_LABEL;
+      if(s1 !== s2) return s1.localeCompare(s2,"ru");
+    }
+    return a.fio.localeCompare(b.fio,"ru");
+  });
+  var monthDays = [], totalCols = 0;
+  for(var m=0;m<12;m++){ monthDays.push(new Date(YEAR,m+1,0).getDate()); totalCols += monthDays[m]; }
+  var mh = "<tr><th class=\"name-cell\">ФИО / День</th>", dh = "<tr><th class=\"name-cell\"></th>";
+  for(var mm=0;mm<12;mm++){
+    mh += "<th class=\"month\" colspan=\"" + monthDays[mm] + "\">" + MONTHS_RU[mm] + "</th>";
+    for(var d=1; d<=monthDays[mm]; d++){
+      var wd = new Date(YEAR,mm,d).getDay();
+      dh += "<th class=\"" + ((wd===0||wd===6) ? "weekend" : "") + "\">" + d + "</th>";
+    }
+  }
+  mh += "</tr>"; dh += "</tr>";
+  var body = "", last = null;
+  for(var n=0;n<list.length;n++){
+    var emp = list[n];
+    if(grouped){
+      var label = emp.subunit || NO_SUBUNIT_LABEL;
+      if(label !== last){ body += "<tr class=\"subunit-header\"><td colspan=\"" + (totalCols+1) + "\">" + esc(label) + "</td></tr>"; last = label; }
+    }
+    body += "<tr><td class=\"name-cell\">" + esc(emp.fio) + "<br><span class=\"small\">" + esc(emp.job) + "</span></td>";
+    var dc = 0;
+    for(var m3=0;m3<12;m3++){
+      for(var d2=1; d2<=monthDays[m3]; d2++){
+        var w2 = new Date(YEAR,m3,d2).getDay(), code = getEmployeeDayCode(emp, dc), cls = "day-cell";
+        if(w2===0||w2===6) cls += " weekend";
+        if(code) cls += " code-" + CODE_MAP_RU[code];
+        body += "<td class=\"" + cls + "\" data-emp=\"" + emp.id + "\" data-day=\"" + dc + "\" title=\"" + (code ? CODE_LABELS[CODE_MAP_RU[code]] : "") + "\"></td>";
+        dc++;
+      }
+    }
+    body += "</tr>";
+  }
+  if(!list.length) body = "<tr><td colspan=\"" + (totalCols+1) + "\" class=\"small\">Нет сотрудников по выбранным условиям.</td></tr>";
+  $("calTable").innerHTML = "<thead>" + mh + dh + "</thead><tbody>" + body + "</tbody>";
+}
+function highlightRange(a, b, empId){
+  var prev = $("calTable").querySelectorAll("td.selected");
+  for(var i=0;i<prev.length;i++) prev[i].classList.remove("selected");
+  var lo = Math.min(a,b), hi = Math.max(a,b);
+  selectedDays = [];
+  for(var d=lo; d<=hi; d++){
+    var cell = $("calTable").querySelector("td[data-emp=\"" + empId + "\"][data-day=\"" + d + "\"]");
+    if(cell){ cell.classList.add("selected"); selectedDays.push(d); }
+  }
+}
+function handleCalMouseDown(ev){
+  var cell = ev.target.closest("td.day-cell"); if(!cell) return;
+  ev.preventDefault();
+  isSelecting = true; selectionEmpId = cell.getAttribute("data-emp"); selectionStartDay = parseInt(cell.getAttribute("data-day"));
+  highlightRange(selectionStartDay, selectionStartDay, selectionEmpId);
+}
+function handleCalMouseOver(ev){
+  if(!isSelecting) return;
+  var cell = ev.target.closest("td.day-cell");
+  if(!cell || cell.getAttribute("data-emp") !== selectionEmpId) return;
+  highlightRange(selectionStartDay, parseInt(cell.getAttribute("data-day")), selectionEmpId);
+}
+function clearSelectionUI(){
+  var prev = $("calTable").querySelectorAll("td.selected");
+  for(var i=0;i<prev.length;i++) prev[i].classList.remove("selected");
+  selectedDays = []; selectionEmpId = null;
+}
+function applyCodeToSelection(){
+  if(!selectedDays.length || !selectionEmpId){ toast("Сначала выделите диапазон дней"); return; }
+  var code = $("calCodeSelect").value, empId = parseInt(selectionEmpId), days = selectedDays.slice();
+  withBusy(function(){
+    var idx = findEmployeeIndex(empId); if(idx === -1) throw new Error("Сотрудник не найден");
+    var emp = DATA.employees[idx];
+    var copy = {periods: JSON.parse(JSON.stringify(emp.periods))};
+    for(var j=0;j<days.length;j++) setEmployeeDayCode(copy, days[j], code);
+    return api("PUT", "/api/employees/" + empId + "/periods", {version: emp.version, periods: copy.periods}).then(function(r){
+      DATA.employees[idx] = r.employee; applyRev(r);
+      toast(code ? ("Отпуск отмечен: " + CODE_LABELS[CODE_MAP_RU[code]]) : "Отметки очищены");
+    });
+  }).then(function(ok){
+    if(ok){ selectedDays = []; selectionEmpId = null; }
+    renderCalendar(); renderEmployeeTable(); renderSummary();
+  });
+}
+
+// ---------------------------------------------------------------- свод
+function computeGroupOccupancy(group){
+  var counts = new Array(TOTAL_DAYS).fill(0);
+  for(var i=0;i<DATA.employees.length;i++){
+    var emp = DATA.employees[i]; if(emp.group !== group) continue;
+    for(var j=0;j<emp.periods.length;j++){
+      var p = emp.periods[j]; if(p.type !== "О" && p.type !== "Д") continue;
+      var s = dayIndexFromDate(p.start), en = dayIndexFromDate(p.end);
+      for(var d=Math.max(0,s); d<=Math.min(TOTAL_DAYS-1,en); d++) counts[d]++;
+    }
+  }
+  return counts;
+}
+function countEmployeesInGroup(group){
+  var c = 0; for(var i=0;i<DATA.employees.length;i++){ if(DATA.employees[i].group === group) c++; } return c;
+}
+function findExceedPeriods(counts, threshold){
+  var out = [], start = null;
+  for(var d=0; d<counts.length; d++){
+    if(counts[d] > threshold){ if(start === null) start = d; }
+    else if(start !== null){ out.push([start,d-1]); start = null; }
+  }
+  if(start !== null) out.push([start, counts.length-1]);
+  return out;
+}
+function thresholdOf(g){ return groupThresholds[g] !== undefined ? groupThresholds[g] : 2; }
+function renderSummary(){
+  var used = {};
+  for(var i=0;i<DATA.employees.length;i++){ if(DATA.employees[i].group) used[DATA.employees[i].group] = true; }
+  var groups = Object.keys(used).sort(function(a,b){ return a.localeCompare(b,"ru"); });
+  var tbody = $("summaryTableBody");
+  if(!groups.length){ tbody.innerHTML = "<tr><td colspan=\"6\" class=\"small\">Нет сотрудников с заполненной смежной группой.</td></tr>"; return; }
+  var html = "";
+  for(var k=0;k<groups.length;k++){
+    var g = groups[k], counts = computeGroupOccupancy(g), th = thresholdOf(g);
+    var maxVal = Math.max.apply(null, counts), exceed = 0;
+    for(var c=0;c<counts.length;c++){ if(counts[c] > th) exceed++; }
+    var parts = findExceedPeriods(counts, th).map(function(r){
+      return r[0] === r[1] ? fmtDate(isoFromDayIndex(r[0])) : fmtDate(isoFromDayIndex(r[0])) + "\u2013" + fmtDate(isoFromDayIndex(r[1]));
+    });
+    html += "<tr class=\"" + (exceed > 0 ? "exceed-row" : (maxVal > 0 ? "warn-row" : "")) + "\"><td>" + esc(g) + "</td><td>" + countEmployeesInGroup(g) + "</td>";
+    html += "<td><input type=\"number\" min=\"0\" value=\"" + th + "\" style=\"width:60px\" class=\"threshold-input\" data-group=\"" + esc(g) + "\"></td>";
+    html += "<td>" + maxVal + "</td><td>" + exceed + "</td><td class=\"small\">" + (parts.length ? parts.join(", ") : "—") + "</td></tr>";
+  }
+  tbody.innerHTML = html;
+}
+function handleSummaryChange(ev){
+  var input = ev.target.closest(".threshold-input"); if(!input) return;
+  var group = input.getAttribute("data-group"), value = parseInt(input.value) || 0;
+  withBusy(function(){
+    return api("PUT", "/api/thresholds", {group: group, value: value}).then(function(r){ groupThresholds = r.thresholds; applyRev(r); });
+  }).then(renderSummary);
+}
+
+// ---------------------------------------------------------------- экспорт
+function xmlEsc(s){ return String(s == null ? "" : s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function safeFileName(s){ return String(s).replace(/[\\\/:*?"<>|]/g, "_").substring(0, 80); }
+function employeesBySubunit(label){
+  return DATA.employees.filter(function(e){ return (e.subunit || NO_SUBUNIT_LABEL) === label; });
+}
+function buildSubunitRows(label){
+  var entries = [];
+  employeesBySubunit(label).forEach(function(emp){
+    emp.periods.forEach(function(p){
+      if(p.type === "О" || p.type === "Д") entries.push({fio: emp.fio, start: p.start, days: periodDays(p), m: monthIndexFromDate(p.start)});
+    });
+  });
+  entries.sort(function(a,b){ return a.m !== b.m ? a.m - b.m : dayIndexFromDate(a.start) - dayIndexFromDate(b.start); });
+  var rows = "";
+  for(var mi=0;mi<12;mi++){
+    rows += "<tr><td colspan=\"3\"><b>" + MONTHS_RU_FULL[mi] + "</b></td></tr>";
+    var inMonth = entries.filter(function(x){ return x.m === mi; });
+    if(!inMonth.length) rows += "<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>";
+    inMonth.forEach(function(x){ rows += "<tr><td>" + xmlEsc(x.fio) + "</td><td>" + fmtDate(x.start) + "</td><td>" + x.days + "</td></tr>"; });
+  }
+  return rows;
+}
+function buildSubunitSection(label, pageBreak){
+  return "<div" + (pageBreak ? " style=\"page-break-before:always;\"" : "") + ">" +
+    "<table><tr><td><b>" + xmlEsc(label) + "</b></td></tr></table><table><tr><td>структурное подразделение</td></tr></table>" +
+    "<table><tr><th>Фамилия, имя, отчество</th><th>Дата начала отпуска</th><th>Количество календарных дней</th></tr>" + buildSubunitRows(label) + "</table>" +
+    "<p>&nbsp;</p><p>Согласовано</p><p>&nbsp;</p><p>Руководитель подразделения _____________________ /______________/</p></div>";
+}
+function wordHead(){
+  return "<html xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:w=\"urn:schemas-microsoft-com:office:word\" xmlns=\"http://www.w3.org/TR/REC-html40\">" +
+    "<head><meta charset=\"utf-8\"><style>body{font-family:Calibri,Arial,sans-serif;font-size:12pt;}table{border-collapse:collapse;width:100%;margin-bottom:10px;}td,th{border:1px solid #000;padding:4px 8px;font-size:11pt;}</style></head><body>";
+}
+function setLink(id, mime, content, filename){
+  var link = $(id);
+  link.href = "data:" + mime + ";charset=utf-8," + encodeURIComponent(content);
+  link.download = filename; link.classList.add("ready");
+}
+function prepareWordExport(){
+  var label = $("exportSubunitSelect").value;
+  if(!label){ toast("Выберите подразделение"); return; }
+  setLink("wordDownloadLink", "application/msword", wordHead() + buildSubunitSection(label, false) + "</body></html>", "Grafik_otpuskov_" + safeFileName(label) + "_" + YEAR + ".doc");
+  $("wordExportStatus").textContent = "Файл готов. Нажмите на зелёную ссылку слева, чтобы скачать.";
+  toast("Файл Word подготовлен — нажмите ссылку для скачивания");
+}
+function prepareWordExportAll(){
+  var list = getUsedSubunits(), html = wordHead();
+  list.forEach(function(l, i){ html += buildSubunitSection(l, i > 0); });
+  setLink("wordAllDownloadLink", "application/msword", html + "</body></html>", "Grafik_otpuskov_vse_podrazdeleniya_" + YEAR + ".doc");
+  $("wordAllExportStatus").textContent = "Файл готов (" + list.length + " подразделений на отдельных страницах). Нажмите на зелёную ссылку слева.";
+  toast("Файл по всем подразделениям подготовлен — нажмите ссылку для скачивания");
+}
+function cell(v, num){ return "<Cell><Data ss:Type=\"" + (num ? "Number" : "String") + "\">" + xmlEsc(v) + "</Data></Cell>"; }
+function prepareExcelExport(){
+  var sheets = "";
+  DATA.departments.forEach(function(dept){
+    var rows = "";
+    DATA.employees.forEach(function(emp){
+      if(emp.dept !== dept) return;
+      var ps = emp.periods.filter(function(p){ return p.type === "О" || p.type === "Д"; });
+      if(!ps.length){ rows += "<Row>" + cell(emp.subunit) + cell(emp.fio) + cell(emp.job) + cell(emp.group) + cell("") + cell("") + cell("") + cell(0,true) + "</Row>"; return; }
+      ps.forEach(function(p){
+        rows += "<Row>" + cell(emp.subunit) + cell(emp.fio) + cell(emp.job) + cell(emp.group) + cell(p.type === "О" ? "Основной" : "Дополнительный") +
+                cell(fmtDate(p.start)) + cell(fmtDate(p.end)) + cell(periodDays(p), true) + "</Row>";
+      });
+    });
+    sheets += "<Worksheet ss:Name=\"" + xmlEsc(dept.substring(0,31)) + "\"><Table><Row>" + ["Детальное подразделение","ФИО сотрудника","Должность","Смежная группа","Вид отпуска","Дата с","Дата по","Кол-во дней"].map(function(h){ return cell(h); }).join("") + "</Row>" + rows + "</Table></Worksheet>";
+  });
+  var used = {}; DATA.employees.forEach(function(e){ if(e.group) used[e.group] = true; });
+  var sum = "<Row>" + ["Смежная группа","Кол-во чел.","Порог, чел.","Макс. одновременно","Дней с превышением"].map(function(h){ return cell(h); }).join("") + "</Row>";
+  Object.keys(used).sort(function(a,b){ return a.localeCompare(b,"ru"); }).forEach(function(g){
+    var counts = computeGroupOccupancy(g), th = thresholdOf(g), ex = 0;
+    counts.forEach(function(c){ if(c > th) ex++; });
+    sum += "<Row>" + cell(g) + cell(countEmployeesInGroup(g), true) + cell(th, true) + cell(Math.max.apply(null, counts), true) + cell(ex, true) + "</Row>";
+  });
+  var xml = "<?xml version=\"1.0\"?><?mso-application progid=\"Excel.Sheet\"?><Workbook xmlns=\"urn:schemas-microsoft-com:office:spreadsheet\" xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:x=\"urn:schemas-microsoft-com:office:excel\" xmlns:ss=\"urn:schemas-microsoft-com:office:spreadsheet\">" +
+    sheets + "<Worksheet ss:Name=\"Свод пересечений\"><Table>" + sum + "</Table></Worksheet></Workbook>";
+  setLink("excelDownloadLink", "application/vnd.ms-excel", xml, "Svod_otpuskov_" + YEAR + ".xls");
+  $("excelExportStatus").textContent = "Файл готов (лист на каждое отделение + свод). Нажмите на зелёную ссылку слева.";
+  toast("Файл Excel подготовлен — нажмите ссылку для скачивания");
+}
+
+// ---------------------------------------------------------------- восстановление из файла
+function onRestoreFileChosen(file){
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      var parsed = JSON.parse(e.target.result);
+      if(!parsed || !Array.isArray(parsed.employees)) throw new Error("bad");
+      pendingRestore = parsed;
+      $("restoreFileName").textContent = "Файл «" + file.name + "»: сотрудников — " + parsed.employees.length + ".";
+      $("restoreConfirmBox").style.display = "flex";
+    }catch(err){ pendingRestore = null; toast("Файл повреждён или имеет неверный формат"); }
+  };
+  reader.readAsText(file);
+}
+function cancelRestore(){ pendingRestore = null; $("restoreConfirmBox").style.display = "none"; $("restoreFileInput").value = ""; }
+function confirmRestore(){
+  if(!pendingRestore) return;
+  var payload = pendingRestore;
+  withBusy(function(){
+    return api("POST", "/api/restore?confirm=yes", {employees: payload.employees, thresholds: payload.thresholds || undefined})
+      .then(function(r){ toast("Восстановлено сотрудников: " + r.restored); return loadAll(); });
+  }).then(function(ok){ cancelRestore(); pendingDeleteId = null; if(ok) refreshAll(); });
+}
+
+// ---------------------------------------------------------------- запуск
+function switchTab(tab){
+  var bs = document.querySelectorAll("nav button");
+  for(var i=0;i<bs.length;i++){ if(bs[i].getAttribute("data-tab") === tab) bs[i].classList.add("active"); else bs[i].classList.remove("active"); }
+  var cs = document.querySelectorAll(".tab-content");
+  for(var j=0;j<cs.length;j++){ if(cs[j].id === "tab-" + tab) cs[j].classList.add("active"); else cs[j].classList.remove("active"); }
+  if(tab === "calendar") renderCalendar();
+  if(tab === "summary") renderSummary();
+}
+function bindEvents(){
+  var bs = document.querySelectorAll("nav button");
+  for(var i=0;i<bs.length;i++){ bs[i].addEventListener("click", function(){ switchTab(this.getAttribute("data-tab")); }); }
+  $("empDeptFilter").addEventListener("change", function(){ currentDeptFilter = this.value; pendingDeleteId = null; renderEmployeeTable(); });
+  $("empSubunitFilter").addEventListener("change", function(){ currentSubunitFilter = this.value; pendingDeleteId = null; renderEmployeeTable(); });
+  $("empSortSelect").addEventListener("change", function(){ currentSort = this.value; renderEmployeeTable(); });
+  $("empSearch").addEventListener("input", function(){ pendingDeleteId = null; renderEmployeeTable(); });
+  $("btnAddEmployee").addEventListener("click", openAddEmployee);
+  $("empModalCancel").addEventListener("click", closeEmpModal);
+  $("empModalSave").addEventListener("click", saveEmployeeModal);
+  $("empTableBody").addEventListener("click", handleEmpTableClick);
+  $("calSubunitFilter").addEventListener("change", function(){ currentCalSubunitFilter = this.value; renderCalendar(); });
+  $("calSortSelect").addEventListener("change", function(){ currentCalSort = this.value; renderCalendar(); });
+  $("btnApplyCode").addEventListener("click", applyCodeToSelection);
+  $("btnClearSelection").addEventListener("click", clearSelectionUI);
+  $("calTable").addEventListener("mousedown", handleCalMouseDown);
+  $("calTable").addEventListener("mouseover", handleCalMouseOver);
+  document.addEventListener("mouseup", function(){ isSelecting = false; });
+  $("summaryTableBody").addEventListener("change", handleSummaryChange);
+  $("exportSubunitSelect").addEventListener("change", function(){ $("wordDownloadLink").classList.remove("ready"); $("wordExportStatus").textContent = ""; });
+  $("btnPrepareWord").addEventListener("click", prepareWordExport);
+  $("btnPrepareWordAll").addEventListener("click", prepareWordExportAll);
+  $("btnPrepareExcel").addEventListener("click", prepareExcelExport);
+  $("btnRestoreJson").addEventListener("click", function(){ $("restoreFileInput").click(); });
+  $("restoreFileInput").addEventListener("change", function(e){ onRestoreFileChosen(e.target.files[0]); });
+  $("btnRestoreYes").addEventListener("click", confirmRestore);
+  $("btnRestoreNo").addEventListener("click", cancelRestore);
+  window.addEventListener("focus", pollRev);
+}
+function initApp(){
+  loadAll().then(function(){
+    initStaticSelectors(); bindEvents(); refreshAll(); appStarted = true;
+    setInterval(pollRev, POLL_MS);
+  }).catch(function(err){
+    setSyncStatus(false);
+    $("syncStatus").textContent = (err && err.status === 401) ? "Нет доступа (401) — обновите страницу и введите логин и пароль" : "● Не удалось загрузить данные с сервера: " + (err && err.message ? err.message : err);
+  });
+}
+if(document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", initApp); } else { initApp(); }
+
+</script>
+</body>
+</html>

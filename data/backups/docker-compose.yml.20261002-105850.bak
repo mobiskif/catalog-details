@@ -1,0 +1,14 @@
+services:
+  vacation-dashboard:
+    build: .
+    container_name: vacation-dashboard
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      VACATION_USERS: ${VACATION_USERS:?Set VACATION_USERS in .env}
+      VACATION_YEAR: "2027"
+      VACATION_DB: /app/data/vacation.db
+      VACATION_SEED: "1"
+    volumes:
+      - ./data:/app/data

@@ -1,0 +1,23 @@
+﻿#requires -Version 5.1
+$ErrorActionPreference = "Stop"
+$Here = Split-Path -Parent $MyInvocation.MyCommand.Path
+Set-Location $Here
+function Fail([string]$Text) { Write-Host "ОШИБКА: $Text" -ForegroundColor Red; exit 1 }
+try { docker version | Out-Null } catch { Fail "Docker Desktop не запущен." }
+if (-not (Test-Path ".env")) {
+  Copy-Item ".env.example" ".env"
+  Write-Host "Создан .env. Укажите реальные логины и пароли, затем запустите скрипт повторно." -ForegroundColor Yellow
+  Start-Process notepad.exe "$Here\.env"
+  exit 0
+}
+$envText = Get-Content ".env" -Raw
+if ($envText -match "ChangeThisPassword" -or $envText -notmatch "VACATION_USERS\s*=") { Fail "Заполните VACATION_USERS в .env." }
+New-Item -ItemType Directory -Force -Path ".\data" | Out-Null
+docker compose up -d --build
+if ($LASTEXITCODE -ne 0) { Fail "Ошибка Docker Compose." }
+$ready = $false
+for ($i = 0; $i -lt 20; $i++) { try { if ((Invoke-WebRequest -UseBasicParsing "http://localhost:8000/healthz" -TimeoutSec 3).Content -eq "ok") { $ready = $true; break } } catch {}; Start-Sleep -Seconds 2 }
+if (-not $ready) { docker compose logs --tail 100; Fail "Сервис не запустился." }
+Write-Host "Готово: http://localhost:8000" -ForegroundColor Green
+Write-Host "Данные: $Here\dataacation.db" -ForegroundColor Green
+Start-Process "http://localhost:8000"
