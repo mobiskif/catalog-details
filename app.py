@@ -15,6 +15,8 @@ def cache(r):r.headers['Cache-Control']='no-store';return r
 def health():return 'ok'
 @app.route('/')
 def index():return send_from_directory(os.path.join(core.BASE,'static'),'index.html')
+@app.route('/holidays.json')
+def holidays():return send_from_directory(core.BASE,'holidays.json')
 @app.route('/api/<path:p>',methods=['GET','POST','PUT','DELETE'])
 def api(p):
  b=request.get_json(silent=True) if request.method in ('POST','PUT') else None
